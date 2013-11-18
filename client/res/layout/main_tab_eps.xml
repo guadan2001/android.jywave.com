@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:background="@color/blue_app_main" >
+
+        <ImageView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/jywave_title_en"
+            android:src="@drawable/app_bar_title_en" />
+
+        <ImageButton
+            android:id="@+id/btnPlaying"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:background="@color/transparent"
+            android:contentDescription="@string/playing"
+            android:src="@drawable/ico_headphone" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/dark_blue_1" >
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listEps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        >
+    </ListView>
+
+</LinearLayout>

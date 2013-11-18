@@ -1,10 +1,10 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
+    <style name="AppBaseTheme" parent="android:Theme.Light.NoTitleBar">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
@@ -16,5 +16,45 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    
+     <style name="main_tab_eps">
+		<item name="android:textSize">12.0dip</item>
+		<item name="android:gravity">center_horizontal</item>
+		<item name="android:background">@drawable/sel_bg_main_tab_eps</item>
+		<item name="android:drawableTop">@drawable/sel_ico_main_tab_eps</item>
+		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:button">@null</item>		
+		<item name="android:layout_weight">1.0</item>
+		<item name="android:paddingBottom">10.0dip</item>
+		<item name="android:paddingTop">10.0dip</item>
+	</style>
+	<style name="main_tab_me">
+		<item name="android:textSize">12.0dip</item>
+		<item name="android:gravity">center_horizontal</item>
+		<item name="android:background">@drawable/sel_bg_main_tab_me</item>
+		<item name="android:drawableTop">@drawable/sel_ico_main_tab_me</item>
+		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:button">@null</item>
+		<item name="android:layout_weight">1.0</item>
+		<item name="android:paddingBottom">10.0dip</item>
+		<item name="android:paddingTop">10.0dip</item>
+	</style>
+	<style name="main_tab_more">
+		<item name="android:textSize">12.0dip</item>
+		<item name="android:gravity">center_horizontal</item>
+		<item name="android:background">@drawable/sel_bg_main_tab_more</item>
+		<item name="android:drawableTop">@drawable/sel_ico_main_tab_more</item>
+		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:button">@null</item>
+		<item name="android:layout_weight">1.0</item>
+		<item name="android:paddingBottom">10.0dip</item>
+		<item name="android:paddingTop">10.0dip</item>
+	</style>
 
 </resources>

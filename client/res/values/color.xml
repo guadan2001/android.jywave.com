@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gray_app_bg">#e6e6e6</color>
+    <color name="blue_app_main">#0099ff</color>
+    <color name="dark_blue_1">#0066cc</color>
+    <color name="dark_blue_2">#003399</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="green_download">#33cc33</color>
+    <color name="green_progress_bar_start">#339933</color>
+    <color name="green_progress_bar_end">#33ff33</color>
+    <color name="gray_text">#999999</color>
+</resources>

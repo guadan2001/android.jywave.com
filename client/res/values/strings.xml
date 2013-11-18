@@ -2,7 +2,11 @@
 <resources>
 
     <string name="app_name">酱油微播</string>
+    <string name="playing">正在播放</string>
+    <string name="jywave_title_en">jywave.com</string>
     <string name="action_settings">Settings</string>
+    <string name="downloading">正在下载</string>
+    <string name="click_to_download">点击下载</string>
     <string name="hello_world">Hello world!</string>
-
+    <string name="back">返回</string>
 </resources>

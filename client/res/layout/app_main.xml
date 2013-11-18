@@ -1,18 +1,85 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AppMainActivity" >
+<?xml version="1.0" encoding="UTF-8"?>
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/tabhost"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/gray_app_bg"
+        android:orientation="vertical" >
 
-   
+        <FrameLayout
+            android:id="@android:id/tabcontent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0" />
 
-</RelativeLayout>
+        <FrameLayout
+            android:id="@+id/realtabcontent"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.0"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <RadioGroup
+                android:id="@+id/main_tab_group"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:orientation="horizontal" >
+
+                <RadioButton
+                    android:id="@+id/main_tab_eps"
+                    style="@style/main_tab_eps"
+                    android:layout_weight="1.0"
+                    android:drawablePadding="10dp"
+                    android:text="节目" />
+
+                <RadioButton
+                    android:id="@+id/main_tab_me"
+                    style="@style/main_tab_me"
+                    android:layout_weight="1.0"
+                    android:checked="true"
+                    android:drawablePadding="10dp"
+                    android:text="我" />
+
+                <RadioButton
+                    android:id="@+id/main_tab_more"
+                    style="@style/main_tab_more"
+                    android:layout_weight="1.0"
+                    android:drawablePadding="10dp"
+                    android:text="更多" />
+            </RadioGroup>
+
+            <!--
+                 <TextView
+                android:id="@+id/main_tab_new_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginLeft="60dip"
+                android:layout_marginTop="1dip"
+                android:background="@drawable/tips"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:visibility="gone" />
+            -->
+        </FrameLayout>
+    </LinearLayout>
+
+</TabHost>
