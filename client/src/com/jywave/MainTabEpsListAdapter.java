@@ -1,11 +1,13 @@
 package com.jywave;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import com.jywave.service.ImageService;
+import com.jywave.vo.Ep;
+import com.jywave.vo.EpsList;
 import com.jywave.vo.EpsListItem;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,18 +16,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainTabEpsListAdapter extends BaseAdapter {
-	private Context context;
-	private List<EpsListItem> listItems;
 	private LayoutInflater listContainer;
+	private AppMain app = AppMain.getInstance();
+	
+	private ImageView epCover;
 
-	public MainTabEpsListAdapter(Context context, List<EpsListItem> listItems) {
-		this.context = context;
+	public MainTabEpsListAdapter(Context context, EpsList epsList) {
 		listContainer = LayoutInflater.from(context);
-		this.listItems = listItems;
 	}
 
 	public int getCount() {
-		return listItems.size();
+		return app.epsList.data.size();
 	}
 
 	public Object getItem(int arg0) {
@@ -62,14 +63,15 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 		TextView status = (TextView) convertView.findViewById(R.id.txtEpStatus);
 		ImageView isNew = (ImageView) convertView
 				.findViewById(R.id.imgEpNewMark);
-		ImageView epCover = (ImageView) convertView
-				.findViewById(R.id.imgEpCover);
 		ImageView star = (ImageView) convertView.findViewById(R.id.imgEpStar);
+		epCover = (ImageView) convertView.findViewById(R.id.imgEpCover);
 
-		title.setText(listItems.get(i).title);
-		length.setText(secondsToString(listItems.get(i).length));
+		Ep ep = app.epsList.data.get(i);
+		
+		title.setText(ep.title);
+		length.setText(ep.getLengthString());
 
-		switch (listItems.get(i).status) {
+		switch (ep.status) {
 		case EpsListItem.IN_SERVER:
 			status.setVisibility(View.GONE);
 			break;
@@ -78,14 +80,14 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 			break;
 		case EpsListItem.DOWNLOADING:
 			status.setText("已下载"
-					+ String.valueOf(listItems.get(i).downloadProgress) + "%");
+					+ String.valueOf(ep.downloadProgress) + "%");
 			break;
 		case EpsListItem.PLAYING:
 			status.setText("正在播放");
 			break;
 		}
 		
-		if(listItems.get(i).isNew)
+		if(ep.isNew)
 		{
 			isNew.setVisibility(View.VISIBLE);
 		}
@@ -94,7 +96,7 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 			isNew.setVisibility(View.GONE);
 		}
 		
-		switch(listItems.get(i).star)
+		switch(ep.star)
 		{
 		case 1:
 			star.setImageResource(R.drawable.star1);
@@ -113,41 +115,38 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 			break;
 		}
 		
-		epCover.setImageResource(R.drawable.ep_cover);
-
+		new GetEpCover().execute(ep.coverUrl);
+		
 		return convertView;
 	}
+	
+	public void setEpCover(Bitmap bmp) {
+		epCover.setImageBitmap(bmp);
+	}
 
-	private String secondsToString(int seconds) {
-		String result = "";
-		int hour = seconds / 3600;
-		seconds %= 3600;
-		int min = seconds / 60;
-		seconds %= 60;
-		
-		if(hour > 0)
-		{
-			result += String.valueOf(hour);
-			result += ":";
+	private class GetEpCover extends AsyncTask<String, Void, Bitmap> {
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
 		}
-		
-		if(min < 10 && hour > 0)
-		{
-			result += "0";
-			
+
+		@Override
+		protected Bitmap doInBackground(String... params) {
+			ImageService imgSrv = new ImageService();
+			return imgSrv.loadImage(params[0]);
 		}
-		
-		result += String.valueOf(min);
-		result += ":";
-		
-		if(seconds < 10 && min > 0)
-		{
-			result += "0";
+
+		@Override
+		protected void onPostExecute(Bitmap result) {
+			if (result != null) {
+				MainTabEpsListAdapter.this.setEpCover(result);
+			}
+			super.onPostExecute(result);
 		}
-		
-		result += String.valueOf(seconds);
-		
-		return result;
-		
+
+		@Override
+		protected void onProgressUpdate(Void... values) {
+			super.onProgressUpdate(values);
+		}
 	}
 }

@@ -13,45 +13,56 @@ public class Ep {
 	public String url;
 	public String coverUrl;
 	public boolean isNew;
+	public int downloadProgress;
+	
+	private String lengthString = "";
 	
 	public final static int IN_SERVER = 0;
 	public final static int DOWNLOADING = 1;
 	public final static int IN_LOCAL = 2;
 	public final static int PLAYING = 3;
-	public final static int DOWNLOADING_PAUSED = 4;
 	
+	//convert seconds to string with "HH:mm:ss" format
 	public String getLengthString() {
 		
-		int seconds = this.length;
-		String result = "";
-		int hour = seconds / 3600;
-		seconds %= 3600;
-		int min = seconds / 60;
-		seconds %= 60;
-		
-		if(hour > 0)
+		if(this.lengthString != "")
 		{
-			result += String.valueOf(hour);
-			result += ":";
+			return lengthString;
 		}
-		
-		if(min < 10 && hour > 0)
+		else
 		{
-			result += "0";
+			int seconds = this.length;
+			String result = "";
+			int hour = seconds / 3600;
+			seconds %= 3600;
+			int min = seconds / 60;
+			seconds %= 60;
 			
+			if(hour > 0)
+			{
+				result += String.valueOf(hour);
+				result += ":";
+			}
+			
+			if(min < 10 && hour > 0)
+			{
+				result += "0";
+				
+			}
+			
+			result += String.valueOf(min);
+			result += ":";
+			
+			if(seconds < 10 && min > 0)
+			{
+				result += "0";
+			}
+			
+			result += String.valueOf(seconds);
+			
+			lengthString = result;
+			
+			return result;
 		}
-		
-		result += String.valueOf(min);
-		result += ":";
-		
-		if(seconds < 10 && min > 0)
-		{
-			result += "0";
-		}
-		
-		result += String.valueOf(seconds);
-		
-		return result;
-		
 	}
 }

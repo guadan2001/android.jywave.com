@@ -11,4 +11,6 @@
     <color name="green_progress_bar_start">#339933</color>
     <color name="green_progress_bar_end">#33ff33</color>
     <color name="gray_text">#999999</color>
+    <color name="red_delete">#ff3333</color>
+    <color name="red_delete_pressed">#cc3333</color>
 </resources>

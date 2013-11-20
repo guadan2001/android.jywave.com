@@ -53,6 +53,8 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:background="@color/white"
             android:orientation="vertical" >
 
@@ -60,114 +62,139 @@
                 android:id="@+id/txtEpTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/app_name"
                 android:textColor="@color/black"
                 android:textSize="20sp" />
 
+            <ImageView
+                android:id="@+id/imgEpCover"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/picture" />
+
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp" >
 
                 <ImageView
-                    android:id="@+id/imgEpCover"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:layout_centerVertical="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/picture" />
-
-                <LinearLayout
-                    android:layout_width="fill_parent"
+                    android:id="@+id/imgEpStar"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp"
-                    android:layout_toRightOf="@+id/imgEpCover"
-                    android:orientation="vertical" >
+                    android:layout_alignParentLeft="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/star1" />
 
-                    <TextView
-                        android:id="@+id/txtEpLength"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:text="@string/app_name"
-                        android:textColor="@color/gray_text" />
-
-                    <ImageView
-                        android:id="@+id/imgEpStar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/star1" />
-
-                    <LinearLayout
-                        android:id="@+id/llStartDownload"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal" >
-
-                        <ImageView
-                            android:id="@+id/imgDownload"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:src="@drawable/ico_download" />
-
-                        <Button
-                            android:id="@+id/btnDownload"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="5dp"
-                            android:background="@color/transparent"
-                            android:text="@string/click_to_download"
-                            android:textColor="@color/green_download" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/llDownloading"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="left"
-                        android:layout_marginTop="10dp"
-                        android:orientation="horizontal" >
-
-                        <ProgressBar
-                            android:id="@+id/pbDownload"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="120dp"
-                            android:layout_height="2dp"
-                            android:layout_gravity="center_vertical"
-                            android:max="100"
-                            android:progress="3"
-                            android:progressDrawable="@drawable/progress_bar" />
-
-                        <ImageButton
-                            android:id="@+id/btnDownloadCtrl"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginLeft="10dp"
-                            android:background="@color/transparent"
-                            android:src="@drawable/ico_download_pause" />
-                    </LinearLayout>
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/txtEpLength"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="10dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/app_name"
+                    android:textColor="@color/gray_text"
+                    android:textSize="18sp" />
             </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/pbDownloadProgress"
+                style="@style/progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:layout_marginTop="20dp"
+                android:max="100"
+                android:progress="80"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/btnDownloadCtrl"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/sel_bg_btn_download"
+                android:clickable="true"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/imgBtnDownloadCtrlIco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_download" />
+
+                <TextView
+                    android:id="@+id/txtBtnDownloadCtrlLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/click_to_download"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/btnDownloadCancel"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/sel_bg_btn_delete"
+                android:clickable="true"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/imgBtnDownloadCancelIco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_delete" />
+
+                <TextView
+                    android:id="@+id/txtBtnDownloadCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/cancel_downloading"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:id="@+id/btnClickToPlay"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/sel_bg_btn_click_to_play"
+                android:clickable="true"
+                android:gravity="center" >
+
+                <ImageView
+                    android:id="@+id/imgBtnClickToPlayIco"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ico_play" />
+
+                <TextView
+                    android:id="@+id/txtBtnClickToPlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/click_to_play"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtEpDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/app_name"
                 android:textColor="@color/black"

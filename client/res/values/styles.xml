@@ -56,5 +56,12 @@
 		<item name="android:paddingBottom">10.0dip</item>
 		<item name="android:paddingTop">10.0dip</item>
 	</style>
+	
+	<style name="progress_bar" parent="android:Widget.ProgressBar.Horizontal">  
+        <item name="android:indeterminateOnly">false</item>  
+        <item name="android:progressDrawable">@drawable/progress_bar</item>  
+        <item name="android:minHeight">12.0dp</item>  
+        <item name="android:maxHeight">12.0dp</item>  
+    </style>  
 
 </resources>

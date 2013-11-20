@@ -3,6 +3,7 @@ package com.jywave;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
@@ -11,12 +12,13 @@ import android.widget.TabHost;
 public class AppMainActivity extends FragmentActivity {
 
 	private TabHost tabHost;
+	private AppMain app = AppMain.getInstance();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.app_main);
-
+		
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup();
 
