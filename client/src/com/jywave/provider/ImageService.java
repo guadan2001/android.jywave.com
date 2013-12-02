@@ -1,4 +1,4 @@
-package com.jywave.service;
+package com.jywave.provider;
 
 import java.io.BufferedInputStream;
 import java.io.File;

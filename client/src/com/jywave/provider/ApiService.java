@@ -1,4 +1,4 @@
-package com.jywave.service;
+package com.jywave.provider;
 
 import android.os.Bundle;
 

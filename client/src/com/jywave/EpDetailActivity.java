@@ -1,17 +1,17 @@
 package com.jywave;
 
 import java.io.File;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.jywave.service.ImageService;
 import com.jywave.util.NetUtil;
 import com.jywave.util.StringUtil;
+import com.jywave.util.imagecache.ImageFetcher;
+import com.jywave.util.imagecache.ImageWorker;
+import com.jywave.vo.DownloadItem;
 import com.jywave.vo.Ep;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
@@ -20,13 +20,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -35,14 +37,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class EpDetailActivity extends Activity {
+public class EpDetailActivity extends FragmentActivity implements OnGestureListener,
+		OnTouchListener {
 
-	private TextView epTitle;
-	private ImageView epCover;
-	private ImageView epStar;
-	private TextView epLength;
-	private TextView epDescription;
+	private LinearLayout pageEpDetail;
+	private TextView txtEpTitle;
+	private ImageView imgEpCover;
+	private ImageView imgEpStar;
+	private TextView txtEpLength;
+	private TextView txtEpDescription;
 	private ImageButton btnBack;
 	private ImageButton btnPlaying;
 	private LinearLayout btnDownloadCtrl;
@@ -53,42 +58,80 @@ public class EpDetailActivity extends Activity {
 	private Context thisContext;
 
 	private DownloadManager downloadMgr;
-
+	
 	private Ep ep;
 	private AppMain app = AppMain.getInstance();
 	private long downloadMgrRef;
 	private int index;
+
+	private GestureDetector gestureDetector;
+	
+	private ImageFetcher imgFetcher;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ep_detail);
 
+		//Get UI elements
 		thisContext = this.getApplicationContext();
 
-		epTitle = (TextView) findViewById(R.id.txtEpTitle);
-		epStar = (ImageView) findViewById(R.id.imgEpStar);
-		epCover = (ImageView) findViewById(R.id.imgEpCover);
-		epLength = (TextView) findViewById(R.id.txtEpLength);
-		epDescription = (TextView) findViewById(R.id.txtEpDescription);
+		pageEpDetail = (LinearLayout) findViewById(R.id.pageEpDetail);
+		txtEpTitle = (TextView) findViewById(R.id.txtEpTitle);
+		imgEpStar = (ImageView) findViewById(R.id.imgEpStar);
+		imgEpCover = (ImageView) findViewById(R.id.imgEpCover);
+		txtEpLength = (TextView) findViewById(R.id.txtEpLength);
+		txtEpDescription = (TextView) findViewById(R.id.txtEpDescription);
 		btnBack = (ImageButton) findViewById(R.id.btnBack);
 		btnPlaying = (ImageButton) findViewById(R.id.btnPlaying);
 		btnDownloadCtrl = (LinearLayout) findViewById(R.id.btnDownloadCtrl);
 		btnDownloadCancel = (LinearLayout) findViewById(R.id.btnDownloadCancel);
-		btnClickToPlay = (LinearLayout)findViewById(R.id.btnClickToPlay);
+		btnClickToPlay = (LinearLayout) findViewById(R.id.btnClickToPlay);
 		pbDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
 
+		//Get EP index		
 		Intent intent = this.getIntent();
 		index = intent.getIntExtra("epIndex", 0);
-
-		ep = app.epsList.data.get(index);
-
-		epTitle.setText(ep.title);
-		epLength.setText(ep.getLengthString());
-		epDescription.setText(ep.description);
 		
-		btnClickToPlay.setVisibility(View.GONE);
+		//Set EP Data
+		ep = app.epsList.data.get(index);
+		
+		app.latestClickedEpIndex = index;
 
+		//Set Texts
+		txtEpTitle.setText(ep.title);
+		txtEpLength.setText(ep.getLengthString());
+		txtEpDescription.setText(ep.description);
+		
+		//hide the "click to play" button
+		btnClickToPlay.setVisibility(View.GONE);
+		
+		//Load EP Cover
+		imgFetcher = new ImageFetcher(this, app.screenWidth - getResources().getDimensionPixelSize(R.dimen.page_ep_detail_margin) * 2);
+        imgFetcher.addImageCache(this.getSupportFragmentManager(), app.cacheParams);
+        imgFetcher.setImageFadeIn(false);
+        imgFetcher.loadImage(ep.coverUrl, imgEpCover);
+        
+        //Ep rank
+        switch (ep.star) {
+		case 1:
+			imgEpStar.setImageResource(R.drawable.star1);
+			break;
+		case 2:
+			imgEpStar.setImageResource(R.drawable.star2);
+			break;
+		case 3:
+			imgEpStar.setImageResource(R.drawable.star3);
+			break;
+		case 4:
+			imgEpStar.setImageResource(R.drawable.star4);
+			break;
+		case 5:
+			imgEpStar.setImageResource(R.drawable.star5);
+			break;
+		}
+
+        //Set download control
 		if (ep.status == Ep.IN_SERVER) {
 			btnDownloadCancel.setVisibility(View.GONE);
 			downloadMgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
@@ -102,38 +145,20 @@ public class EpDetailActivity extends Activity {
 			downloadMgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
 			downloadMgrRef = Long.parseLong(app.downloadList.get(String
 					.valueOf(index)));
-			
+
 			startListenDownloadComplete();
-			downloadProgressUpdater.scheduleAtFixedRate(updateDownloadProgress, 0, 5, TimeUnit.SECONDS);
+			downloadProgressUpdater = Executors.newScheduledThreadPool(1);
+			downloadProgressUpdater.scheduleAtFixedRate(updateDownloadStatus,
+					0, 5, TimeUnit.SECONDS);
 		} else {
 			btnDownloadCtrl.setVisibility(View.GONE);
 			btnDownloadCancel.setVisibility(View.GONE);
 		}
 
-		switch (ep.star) {
-		case 1:
-			epStar.setImageResource(R.drawable.star1);
-			break;
-		case 2:
-			epStar.setImageResource(R.drawable.star2);
-			break;
-		case 3:
-			epStar.setImageResource(R.drawable.star3);
-			break;
-		case 4:
-			epStar.setImageResource(R.drawable.star4);
-			break;
-		case 5:
-			epStar.setImageResource(R.drawable.star5);
-			break;
-		}
-
 		if (!app.isPlaying()) {
 			btnPlaying.setVisibility(View.GONE);
 		}
-
-		new GetEpCover().execute(ep.coverUrl);
-
+        
 		btnBack.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -143,6 +168,13 @@ public class EpDetailActivity extends Activity {
 
 		btnDownloadCtrl.setOnClickListener(downloadCtrlListener);
 		btnDownloadCancel.setOnClickListener(downloadCancelListener);
+
+		
+		//gesture implementation
+		gestureDetector = new GestureDetector(this, this);
+		pageEpDetail.setOnTouchListener(this);
+		pageEpDetail.setLongClickable(true);
+
 	}
 
 	private OnClickListener downloadCtrlListener = new OnClickListener() {
@@ -152,7 +184,7 @@ public class EpDetailActivity extends Activity {
 
 			ep.status = Ep.DOWNLOADING;
 			app.epsList.data.get(index).status = Ep.DOWNLOADING;
-
+			
 			btnDownloadCancel.setVisibility(View.VISIBLE);
 			btnDownloadCtrl.setVisibility(View.GONE);
 			pbDownloadProgress.setVisibility(View.VISIBLE);
@@ -168,47 +200,64 @@ public class EpDetailActivity extends Activity {
 			}
 			downloadMgrRef = downloadMgr.enqueue(request);
 
-			app.epsList.data.get(index).downloadProgress = 30;
-
 			app.downloadList.put(String.valueOf(index),
 					String.valueOf(downloadMgrRef));
-			
+
 			pbDownloadProgress.setProgress(0);
-			
+
 			startListenDownloadComplete();
 			downloadProgressUpdater = Executors.newScheduledThreadPool(1);
-			downloadProgressUpdater.scheduleAtFixedRate(updateDownloadProgress, 0, 5, TimeUnit.SECONDS);
+			downloadProgressUpdater.scheduleAtFixedRate(updateDownloadStatus,
+					0, 3, TimeUnit.SECONDS);
 		}
 	};
-	
-	private void startListenDownloadComplete()
-	{
+
+	private void startListenDownloadComplete() {
 		registerReceiver(receiver, filter);
 	}
-	
-	private void stopListenDownloadComplete()
-	{
+
+	private void stopListenDownloadComplete() {
 		unregisterReceiver(receiver);
 	}
-	
-	private IntentFilter filter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-	private BroadcastReceiver receiver = new BroadcastReceiver(){
+
+	private IntentFilter filter = new IntentFilter(
+			DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+	private BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override
-		public void onReceive(Context context, Intent intent)
-		{
-			long reference = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-			if(reference == downloadMgrRef)
-			{
-				btnDownloadCancel.setVisibility(View.GONE);
-				pbDownloadProgress.setVisibility(View.GONE);
-				btnClickToPlay.setVisibility(View.VISIBLE);
+		public void onReceive(Context context, Intent intent) {
+			long reference = intent.getLongExtra(
+					DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+			if (reference == downloadMgrRef) {
+				DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
+				if(di.status == DownloadManager.STATUS_SUCCESSFUL)
+				{
+					btnDownloadCancel.setVisibility(View.GONE);
+					pbDownloadProgress.setVisibility(View.GONE);
+					btnClickToPlay.setVisibility(View.VISIBLE);
+
+					ep.status = Ep.IN_LOCAL;
+					app.epsList.data.get(index).status = Ep.IN_LOCAL;
+
+					app.downloadList.remove(index);
+				}
+				else if(di.status == DownloadManager.STATUS_FAILED)
+				{
+					btnDownloadCancel.setVisibility(View.GONE);
+					pbDownloadProgress.setVisibility(View.GONE);
+					btnDownloadCtrl.setVisibility(View.VISIBLE);
+					
+					ep.status = Ep.IN_SERVER;
+					app.epsList.data.get(index).status = Ep.IN_SERVER;
+					
+					ep.downloadProgress = 0;
+					app.epsList.data.get(index).downloadProgress = 0;
+
+					app.downloadList.remove(index);
+					
+					Toast.makeText(thisContext, "下载失败，错误代码："+String.valueOf(di.reason), Toast.LENGTH_LONG).show();
+				}
 				
-				ep.status = Ep.IN_LOCAL;
-				app.epsList.data.get(index).status = Ep.IN_LOCAL;
-				
-				app.downloadList.remove(index);
-				
-				downloadProgressUpdater.shutdown();
+				downloadProgressUpdater.shutdownNow();
 			}
 		}
 	};
@@ -255,9 +304,9 @@ public class EpDetailActivity extends Activity {
 
 							downloadMgr.remove(downloadMgrRef);
 							app.downloadList.remove(String.valueOf(index));
-							
+
 							stopListenDownloadComplete();
-							downloadProgressUpdater.shutdown();
+							downloadProgressUpdater.shutdownNow();
 						}
 					});
 
@@ -274,44 +323,99 @@ public class EpDetailActivity extends Activity {
 		}
 	};
 
-	public void setEpCover(Bitmap bmp) {
-		epCover = (ImageView) findViewById(R.id.imgEpCover);
-		epCover.setImageBitmap(bmp);
-	}
-
-	private class GetEpCover extends AsyncTask<String, Void, Bitmap> {
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-
-		@Override
-		protected Bitmap doInBackground(String... params) {
-			ImageService imgSrv = new ImageService();
-			return imgSrv.loadImage(params[0]);
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap result) {
-			if (result != null) {
-				EpDetailActivity.this.setEpCover(result);
-			}
-			super.onPostExecute(result);
-		}
-
-		@Override
-		protected void onProgressUpdate(Void... values) {
-			super.onProgressUpdate(values);
-		}
-	}
-	
 	private ScheduledExecutorService downloadProgressUpdater;
-	private Runnable updateDownloadProgress = new Runnable() {
-		
+	private Runnable updateDownloadStatus = new Runnable() {
+
 		@Override
 		public void run() {
-			int downloadProgress = NetUtil.getDownloadProgressByRefId(downloadMgr, downloadMgrRef);
-			pbDownloadProgress.setProgress(downloadProgress);
+			DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
+			
+			if(di.status == DownloadManager.STATUS_RUNNING)
+			{
+				pbDownloadProgress.setProgress(di.progress);
+				ep.downloadProgress = di.progress;
+				app.epsList.data.get(index).downloadProgress = di.progress;
+			}
 		}
 	};
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		if (e1.getX() - e2.getX() < -120) {
+			finish();
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		return gestureDetector.onTouchEvent(event);
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (gestureDetector.onTouchEvent(event)) {
+			event.setAction(MotionEvent.ACTION_CANCEL);
+		}
+		return super.dispatchTouchEvent(event);
+	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		return false;
+	}
+	
+	@Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (imgEpCover != null) {
+            // Cancel any pending image work
+            ImageWorker.cancelWork(imgEpCover);
+            imgEpCover.setImageDrawable(null);
+        }
+        
+        imgFetcher.closeCache();
+        
+        if(ep.status == Ep.DOWNLOADING)
+        {
+        	unregisterReceiver(receiver);
+        	downloadProgressUpdater.shutdownNow();
+        }
+    }
+	
+	@Override
+    protected void onPause() {
+        super.onPause();
+        imgFetcher.setExitTasksEarly(true);
+        imgFetcher.flushCache();
+    }
+	
+    @Override
+    public void onResume() {
+        super.onResume();
+        imgFetcher.setExitTasksEarly(false);
+    }
 }

@@ -3,8 +3,15 @@ package com.jywave;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TabHost;
@@ -12,6 +19,7 @@ import android.widget.TabHost;
 public class AppMainActivity extends FragmentActivity {
 
 	private TabHost tabHost;
+	private RadioGroup tabGroup;
 	private AppMain app = AppMain.getInstance();
 
 	@Override
@@ -19,9 +27,15 @@ public class AppMainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.app_main);
 		
+		//get screen's height and width
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        app.screenHeight = displayMetrics.heightPixels;
+        app.screenWidth = displayMetrics.widthPixels;
+		
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup();
-
+		
 		TabHost.OnTabChangeListener tabChangeListener = new TabHost.OnTabChangeListener() {
 
 			@Override
@@ -98,8 +112,7 @@ public class AppMainActivity extends FragmentActivity {
 		tSpecMore.setContent(new DummyTabContent(getBaseContext()));
 		tabHost.addTab(tSpecMore);
 
-		RadioGroup tabGroup = (RadioGroup) this
-				.findViewById(R.id.main_tab_group);
+		tabGroup = (RadioGroup) findViewById(R.id.main_tab_group);
 		tabGroup.check(R.id.main_tab_eps);
 
 		tabGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -129,5 +142,4 @@ public class AppMainActivity extends FragmentActivity {
 		getMenuInflater().inflate(R.menu.app_main, menu);
 		return true;
 	}
-
 }

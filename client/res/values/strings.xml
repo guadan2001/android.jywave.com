@@ -12,5 +12,6 @@
     <string name="resume_downloading">恢复下载</string>
     <string name="pause_downloading">暂停下载</string>
     <string name="hello_world">Hello world!</string>
+    <string name="no_network_connection_toast">无法连接网络</string>
     <string name="back">返回</string>
 </resources>

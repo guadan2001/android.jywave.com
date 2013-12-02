@@ -1,28 +1,33 @@
 package com.jywave;
 
-import com.jywave.service.ImageService;
+import com.jywave.util.imagecache.ImageFetcher;
 import com.jywave.vo.Ep;
-import com.jywave.vo.EpsList;
-import com.jywave.vo.EpsListItem;
-
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainTabEpsListAdapter extends BaseAdapter {
-	private LayoutInflater listContainer;
-	private AppMain app = AppMain.getInstance();
-	
-	private ImageView epCover;
 
-	public MainTabEpsListAdapter(Context context, EpsList epsList) {
+	private static final String TAG = "MainTabEpsListAdapter";
+
+	private LayoutInflater listContainer;
+
+	private AppMain app = AppMain.getInstance();
+	private Ep ep;
+
+	private ImageFetcher imgFetcher;
+	
+	private ViewHolder viewHolder;
+
+	public MainTabEpsListAdapter(Context context, ImageFetcher imgFetcher) {
 		listContainer = LayoutInflater.from(context);
+		this.imgFetcher = imgFetcher;
 	}
 
 	public int getCount() {
@@ -37,116 +42,82 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 		return 0;
 	}
 
-	/**
-	 * 显示物品详情
-	 * 
-	 * @param clickID
-	 */
-	// private void showDetailInfo(int clickID) {
-	// new AlertDialog.Builder(context)
-	// .setTitle("物品详情：" + listItems.get(clickID).get("info"))
-	// .setMessage(listItems.get(clickID).get("detail").toString())
-	// .setPositiveButton("确定", null)
-	// .show();
-	// }
-
-	/**
-	 * ListView Item设置
-	 */
 	public View getView(int i, View convertView, ViewGroup parent) {
 
-		convertView = listContainer.inflate(R.layout.main_tab_eps_list_item,
-				null);
+		if (convertView == null) {
+			convertView = listContainer.inflate(R.layout.main_tab_eps_list_item, null);
+			
+			viewHolder = new ViewHolder();
+			viewHolder.txtEpTitle = (TextView) convertView.findViewById(R.id.txtEpTitle);
+			viewHolder.txtEpLength = (TextView) convertView.findViewById(R.id.txtEpLength);
+			viewHolder.txtEpStatus = (TextView) convertView.findViewById(R.id.txtEpStatus);
+			viewHolder.imgEpIsNew = (ImageView) convertView.findViewById(R.id.imgEpNewMark);
+			viewHolder.imgEpStar = (ImageView) convertView.findViewById(R.id.imgEpStar);
+			
+			convertView.setTag(viewHolder);
+		} else {
+			viewHolder = (ViewHolder) convertView.getTag();
+		}
 
-		TextView title = (TextView) convertView.findViewById(R.id.txtEpTitle);
-		TextView length = (TextView) convertView.findViewById(R.id.txtEpLength);
-		TextView status = (TextView) convertView.findViewById(R.id.txtEpStatus);
-		ImageView isNew = (ImageView) convertView
-				.findViewById(R.id.imgEpNewMark);
-		ImageView star = (ImageView) convertView.findViewById(R.id.imgEpStar);
-		epCover = (ImageView) convertView.findViewById(R.id.imgEpCover);
+		ep = app.epsList.data.get(i);
 
-		Ep ep = app.epsList.data.get(i);
-		
-		title.setText(ep.title);
-		length.setText(ep.getLengthString());
+		viewHolder.txtEpTitle.setText(ep.title);
+		viewHolder.txtEpLength.setText(ep.getLengthString());
+
+		if (ep.isNew) {
+			viewHolder.imgEpIsNew.setVisibility(View.VISIBLE);
+		} else {
+			viewHolder.imgEpIsNew.setVisibility(View.GONE);
+		}
 
 		switch (ep.status) {
-		case EpsListItem.IN_SERVER:
-			status.setVisibility(View.GONE);
+		case Ep.IN_SERVER:
+			viewHolder.txtEpStatus.setVisibility(View.GONE);
 			break;
-		case EpsListItem.IN_LOCAL:
-			status.setText("已下载");
+		case Ep.IN_LOCAL:
+			viewHolder.txtEpStatus.setText("已下载");
 			break;
-		case EpsListItem.DOWNLOADING:
-			status.setText("已下载"
-					+ String.valueOf(ep.downloadProgress) + "%");
+		case Ep.DOWNLOADING:
+			viewHolder.txtEpStatus.setText("已下载" + String.valueOf(ep.downloadProgress)
+					+ "%");
 			break;
-		case EpsListItem.PLAYING:
-			status.setText("正在播放");
+		case Ep.PLAYING:
+			viewHolder.txtEpStatus.setText("正在播放");
 			break;
 		}
-		
-		if(ep.isNew)
-		{
-			isNew.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			isNew.setVisibility(View.GONE);
-		}
-		
-		switch(ep.star)
-		{
+
+		switch (ep.star) {
 		case 1:
-			star.setImageResource(R.drawable.star1);
+			viewHolder.imgEpStar.setImageResource(R.drawable.star1);
 			break;
 		case 2:
-			star.setImageResource(R.drawable.star2);
+			viewHolder.imgEpStar.setImageResource(R.drawable.star2);
 			break;
 		case 3:
-			star.setImageResource(R.drawable.star3);
+			viewHolder.imgEpStar.setImageResource(R.drawable.star3);
 			break;
 		case 4:
-			star.setImageResource(R.drawable.star4);
+			viewHolder.imgEpStar.setImageResource(R.drawable.star4);
 			break;
 		case 5:
-			star.setImageResource(R.drawable.star5);
+			viewHolder.imgEpStar.setImageResource(R.drawable.star5);
 			break;
 		}
-		
-		new GetEpCover().execute(ep.coverUrl);
-		
+
+		viewHolder.imgEpCover = (ImageView) convertView.findViewById(R.id.imgEpCover);
+		imgFetcher.setImageFadeIn(true);
+		imgFetcher.loadImage(ep.coverThumbnailUrl, viewHolder.imgEpCover);
+
 		return convertView;
 	}
-	
-	public void setEpCover(Bitmap bmp) {
-		epCover.setImageBitmap(bmp);
+
+	private static class ViewHolder {
+		public TextView txtEpTitle;
+		public TextView txtEpLength;
+		public TextView txtEpStatus;
+		public ImageView imgEpCover;
+		public ImageView imgEpIsNew;
+		public ImageView imgEpStar;
 	}
 
-	private class GetEpCover extends AsyncTask<String, Void, Bitmap> {
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-
-		@Override
-		protected Bitmap doInBackground(String... params) {
-			ImageService imgSrv = new ImageService();
-			return imgSrv.loadImage(params[0]);
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap result) {
-			if (result != null) {
-				MainTabEpsListAdapter.this.setEpCover(result);
-			}
-			super.onPostExecute(result);
-		}
-
-		@Override
-		protected void onProgressUpdate(Void... values) {
-			super.onProgressUpdate(values);
-		}
-	}
 }

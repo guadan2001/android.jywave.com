@@ -12,6 +12,7 @@ public class Ep {
 	public int star;
 	public String url;
 	public String coverUrl;
+	public String coverThumbnailUrl;
 	public boolean isNew;
 	public int downloadProgress;
 	
