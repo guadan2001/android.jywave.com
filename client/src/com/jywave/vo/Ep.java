@@ -5,7 +5,7 @@ import java.util.Date;
 public class Ep {
 	public int id;
 	public String title;
-	public int length;
+	public int duration;
 	public int status;
 	public String description;
 	public Date publishDate;
@@ -32,7 +32,7 @@ public class Ep {
 		}
 		else
 		{
-			int seconds = this.length;
+			int seconds = this.duration;
 			String result = "";
 			int hour = seconds / 3600;
 			seconds %= 3600;
@@ -54,7 +54,7 @@ public class Ep {
 			result += String.valueOf(min);
 			result += ":";
 			
-			if(seconds < 10 && min > 0)
+			if(seconds < 10)
 			{
 				result += "0";
 			}
@@ -65,5 +65,11 @@ public class Ep {
 			
 			return result;
 		}
+	}
+	
+	public String getEpFilename()
+	{
+		int i = url.lastIndexOf("/");
+		return url.substring(i+1, url.length());
 	}
 }

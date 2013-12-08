@@ -1,11 +1,24 @@
-package com.jywave;
+package com.jywave.ui.fragments;
 
+import com.jywave.AppMain;
+import com.jywave.R;
+import com.jywave.R.dimen;
+import com.jywave.R.drawable;
+import com.jywave.R.id;
+import com.jywave.R.layout;
+import com.jywave.player.Player;
+import com.jywave.ui.activities.EpDetailActivity;
+import com.jywave.ui.activities.PlayerActivity;
+import com.jywave.ui.adapters.MainTabEpsListAdapter;
 import com.jywave.util.imagecache.ImageFetcher;
+import com.jywave.vo.Ep;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -16,10 +29,11 @@ import android.widget.ListView;
 
 public class MainTabEpsFragment extends Fragment {
 
-	private static final String TAG = "MainTabEpsFragment";
-
 	private ListView listEps;
 	private AppMain app = AppMain.getInstance();
+	private Player player = Player.getInstance();
+	
+	private ImageButton btnPlaying;
 
 	private MainTabEpsListAdapter epsAdapter;
 
@@ -32,11 +46,9 @@ public class MainTabEpsFragment extends Fragment {
 
 		listEps = (ListView) view.findViewById(R.id.listEps);
 
-		ImageButton btnPlaying = (ImageButton) view
-				.findViewById(R.id.btnPlaying);
-		AppMain appMain = AppMain.getInstance();
+		btnPlaying = (ImageButton) view.findViewById(R.id.btnPlaying);
 
-		if (!appMain.isPlaying()) {
+		if (!player.isPlaying) {
 			btnPlaying.setVisibility(View.GONE);
 		}
 
@@ -44,7 +56,7 @@ public class MainTabEpsFragment extends Fragment {
 		// children asynchronously
 		imgFetcher = new ImageFetcher(getActivity(), getResources()
 				.getDimensionPixelSize(R.dimen.ep_cover_thumbnail));
-		imgFetcher.setLoadingImage(R.drawable.ep_cover);
+		imgFetcher.setLoadingImage(R.drawable.picture);
 		imgFetcher.addImageCache(getActivity().getSupportFragmentManager(),
 				app.cacheParams);
 
@@ -57,8 +69,19 @@ public class MainTabEpsFragment extends Fragment {
 					long arg3) {
 				Intent intent = new Intent();
 				intent.putExtra("epIndex", arg2);
-				intent.setClass(arg1.getContext(), EpDetailActivity.class);
-				startActivity(intent);
+				
+				int status =app.epsList.data.get(arg2).status; 
+				
+				if(status == Ep.IN_SERVER || status == Ep.DOWNLOADING)
+				{
+					intent.setClass(arg1.getContext(), EpDetailActivity.class);
+					startActivity(intent);
+				}
+				else
+				{
+					intent.setClass(arg1.getContext(), PlayerActivity.class);
+					startActivity(intent);
+				}
 			}
 		});
 
@@ -75,6 +98,17 @@ public class MainTabEpsFragment extends Fragment {
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
 
+			}
+		});
+		
+		btnPlaying.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.setClass(v.getContext(), PlayerActivity.class);
+				startActivity(intent);
 			}
 		});
 

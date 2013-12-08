@@ -1,12 +1,16 @@
 package com.jywave;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.jywave.provider.EpService;
+import com.jywave.player.Player;
+import com.jywave.provider.EpProvider;
 import com.jywave.util.imagecache.ImageCache.ImageCacheParams;
+import com.jywave.vo.Ep;
 import com.jywave.vo.EpsList;
 
 import android.R.integer;
@@ -19,9 +23,10 @@ public class AppMain extends Application {
 
 	public static AppMain singleton;
 	public static final String TAG = "App Main";
-	public static final boolean DEBUG = true;
-
-	private boolean isPlaying;
+	public static final boolean DEBUG = false;
+	
+	// Music Player
+	public Player player;
 
 	public EpsList epsList;
 	
@@ -31,10 +36,8 @@ public class AppMain extends Application {
 	public Map<String, String> downloadList;
 
 	// LocalStorage
-	public static final String localStorageDir = Environment
-			.getExternalStorageDirectory().toString() + "/jywave.com/";
-	public String mp3StorageDir = localStorageDir + "mp3/";
-
+	public static final String localStorageDir = Environment.getExternalStorageDirectory().toString() + "/jywave.com/";
+	public static final String mp3StorageDir = localStorageDir + "mp3/";
 	public static final String imagesCacheDir = localStorageDir + "images/";
 
 	// Network
@@ -56,6 +59,8 @@ public class AppMain extends Application {
 	
 	//UI
 	public int listEpsScrollPosition = 0;
+	
+	
 
 	public static AppMain getInstance() {
 		return singleton;
@@ -75,7 +80,7 @@ public class AppMain extends Application {
 		
 		latestClickedEpIndex = -1;
 		
-		EpService epSrv = new EpService();
+		EpProvider epSrv = new EpProvider();
 		
 		for(int i=0;i<12;i++)
 		{
@@ -107,13 +112,8 @@ public class AppMain extends Application {
 		//set image cache parameters
 		cacheParams = new ImageCacheParams(this, "images");
 		cacheParams.setMemCacheSizePercent(0.25f);
-	}
-
-	public boolean isPlaying() {
-		return this.isPlaying;
-	}
-
-	public void playing(boolean isPlaying) {
-		this.isPlaying = isPlaying;
+		
+		player = Player.getInstance();
+		player.refreshPlaylist();
 	}
 }

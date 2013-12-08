@@ -14,4 +14,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="no_network_connection_toast">无法连接网络</string>
     <string name="back">返回</string>
+    <string name="none">无</string>
+    <string name="okay">确定</string>
+    <string name="sleep_timer">睡眠定时</string>
+    <string name="sleep_timer_15mins">15分钟</string>
+    <string name="sleep_timer_30mins">30分钟</string>
+    <string name="sleep_timer_1hour">1小时</string>
+    <string name="sleep_timer_2hours">2小时</string>
+    <string name="sleep_timer_stop_when_ep_ends">单集播放完成后停止</string>
 </resources>

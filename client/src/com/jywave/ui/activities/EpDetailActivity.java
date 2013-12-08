@@ -1,10 +1,18 @@
-package com.jywave;
+package com.jywave.ui.activities;
 
 import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.jywave.AppMain;
+import com.jywave.R;
+import com.jywave.R.anim;
+import com.jywave.R.dimen;
+import com.jywave.R.drawable;
+import com.jywave.R.id;
+import com.jywave.R.layout;
+import com.jywave.player.Player;
 import com.jywave.util.NetUtil;
 import com.jywave.util.StringUtil;
 import com.jywave.util.imagecache.ImageFetcher;
@@ -39,8 +47,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class EpDetailActivity extends FragmentActivity implements OnGestureListener,
-		OnTouchListener {
+public class EpDetailActivity extends FragmentActivity implements
+		OnGestureListener, OnTouchListener {
 
 	private LinearLayout pageEpDetail;
 	private TextView txtEpTitle;
@@ -58,14 +66,15 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 	private Context thisContext;
 
 	private DownloadManager downloadMgr;
-	
+
 	private Ep ep;
 	private AppMain app = AppMain.getInstance();
+	private Player player = Player.getInstance();
 	private long downloadMgrRef;
 	private int index;
 
 	private GestureDetector gestureDetector;
-	
+
 	private ImageFetcher imgFetcher;
 
 	@Override
@@ -73,7 +82,7 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ep_detail);
 
-		//Get UI elements
+		// Get UI elements
 		thisContext = this.getApplicationContext();
 
 		pageEpDetail = (LinearLayout) findViewById(R.id.pageEpDetail);
@@ -89,31 +98,35 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 		btnClickToPlay = (LinearLayout) findViewById(R.id.btnClickToPlay);
 		pbDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
 
-		//Get EP index		
+		// Get EP index
 		Intent intent = this.getIntent();
 		index = intent.getIntExtra("epIndex", 0);
-		
-		//Set EP Data
+
+		// Set EP Data
 		ep = app.epsList.data.get(index);
-		
+
 		app.latestClickedEpIndex = index;
 
-		//Set Texts
+		// Set Texts
 		txtEpTitle.setText(ep.title);
 		txtEpLength.setText(ep.getLengthString());
 		txtEpDescription.setText(ep.description);
-		
-		//hide the "click to play" button
+
+		// hide the "click to play" button
 		btnClickToPlay.setVisibility(View.GONE);
-		
-		//Load EP Cover
-		imgFetcher = new ImageFetcher(this, app.screenWidth - getResources().getDimensionPixelSize(R.dimen.page_ep_detail_margin) * 2);
-        imgFetcher.addImageCache(this.getSupportFragmentManager(), app.cacheParams);
-        imgFetcher.setImageFadeIn(false);
-        imgFetcher.loadImage(ep.coverUrl, imgEpCover);
-        
-        //Ep rank
-        switch (ep.star) {
+
+		// Load EP Cover
+		imgFetcher = new ImageFetcher(this, app.screenWidth
+				- getResources().getDimensionPixelSize(
+						R.dimen.page_ep_detail_margin) * 2);
+		imgFetcher.addImageCache(this.getSupportFragmentManager(),
+				app.cacheParams);
+		imgFetcher.setImageFadeIn(true);
+		imgEpCover.setTag(ep.coverUrl);
+		imgFetcher.loadImage(ep.coverUrl, imgEpCover);
+
+		// Ep rank
+		switch (ep.star) {
 		case 1:
 			imgEpStar.setImageResource(R.drawable.star1);
 			break;
@@ -131,7 +144,7 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 			break;
 		}
 
-        //Set download control
+		// Set download control
 		if (ep.status == Ep.IN_SERVER) {
 			btnDownloadCancel.setVisibility(View.GONE);
 			downloadMgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
@@ -155,10 +168,10 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 			btnDownloadCancel.setVisibility(View.GONE);
 		}
 
-		if (!app.isPlaying()) {
+		if (!player.isPlaying) {
 			btnPlaying.setVisibility(View.GONE);
 		}
-        
+
 		btnBack.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -166,11 +179,20 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 			}
 		});
 
+		btnPlaying.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.setClass(v.getContext(), PlayerActivity.class);
+				startActivity(intent);
+			}
+		});
+
 		btnDownloadCtrl.setOnClickListener(downloadCtrlListener);
 		btnDownloadCancel.setOnClickListener(downloadCancelListener);
 
-		
-		//gesture implementation
+		// gesture implementation
 		gestureDetector = new GestureDetector(this, this);
 		pageEpDetail.setOnTouchListener(this);
 		pageEpDetail.setLongClickable(true);
@@ -184,7 +206,7 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 
 			ep.status = Ep.DOWNLOADING;
 			app.epsList.data.get(index).status = Ep.DOWNLOADING;
-			
+
 			btnDownloadCancel.setVisibility(View.VISIBLE);
 			btnDownloadCtrl.setVisibility(View.GONE);
 			pbDownloadProgress.setVisibility(View.VISIBLE);
@@ -193,8 +215,8 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 			String filename = StringUtil.getFilenameFromUrl(ep.url);
 			DownloadManager.Request request = new Request(uri);
 			request.setTitle(ep.title);
-			request.setDestinationUri(Uri.fromFile(new File(app.mp3StorageDir
-					+ filename)));
+			request.setDestinationUri(Uri.fromFile(new File(
+					AppMain.mp3StorageDir + filename)));
 			if (app.allowDownloadWithoutWifi) {
 				request.setAllowedNetworkTypes(Request.NETWORK_WIFI);
 			}
@@ -228,9 +250,9 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 			long reference = intent.getLongExtra(
 					DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 			if (reference == downloadMgrRef) {
-				DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
-				if(di.status == DownloadManager.STATUS_SUCCESSFUL)
-				{
+				DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr,
+						downloadMgrRef);
+				if (di.status == DownloadManager.STATUS_SUCCESSFUL) {
 					btnDownloadCancel.setVisibility(View.GONE);
 					pbDownloadProgress.setVisibility(View.GONE);
 					btnClickToPlay.setVisibility(View.VISIBLE);
@@ -238,25 +260,27 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 					ep.status = Ep.IN_LOCAL;
 					app.epsList.data.get(index).status = Ep.IN_LOCAL;
 
+					player.refreshPlaylist();
+
 					app.downloadList.remove(index);
-				}
-				else if(di.status == DownloadManager.STATUS_FAILED)
-				{
+				} else if (di.status == DownloadManager.STATUS_FAILED) {
 					btnDownloadCancel.setVisibility(View.GONE);
 					pbDownloadProgress.setVisibility(View.GONE);
 					btnDownloadCtrl.setVisibility(View.VISIBLE);
-					
+
 					ep.status = Ep.IN_SERVER;
 					app.epsList.data.get(index).status = Ep.IN_SERVER;
-					
+
 					ep.downloadProgress = 0;
 					app.epsList.data.get(index).downloadProgress = 0;
 
 					app.downloadList.remove(index);
-					
-					Toast.makeText(thisContext, "下载失败，错误代码："+String.valueOf(di.reason), Toast.LENGTH_LONG).show();
+
+					Toast.makeText(thisContext,
+							"下载失败，错误代码：" + String.valueOf(di.reason),
+							Toast.LENGTH_LONG).show();
 				}
-				
+
 				downloadProgressUpdater.shutdownNow();
 			}
 		}
@@ -328,10 +352,10 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 
 		@Override
 		public void run() {
-			DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
-			
-			if(di.status == DownloadManager.STATUS_RUNNING)
-			{
+			DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr,
+					downloadMgrRef);
+
+			if (di.status == DownloadManager.STATUS_RUNNING) {
 				pbDownloadProgress.setProgress(di.progress);
 				ep.downloadProgress = di.progress;
 				app.epsList.data.get(index).downloadProgress = di.progress;
@@ -387,35 +411,34 @@ public class EpDetailActivity extends FragmentActivity implements OnGestureListe
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
 	}
-	
+
 	@Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (imgEpCover != null) {
-            // Cancel any pending image work
-            ImageWorker.cancelWork(imgEpCover);
-            imgEpCover.setImageDrawable(null);
-        }
-        
-        imgFetcher.closeCache();
-        
-        if(ep.status == Ep.DOWNLOADING)
-        {
-        	unregisterReceiver(receiver);
-        	downloadProgressUpdater.shutdownNow();
-        }
-    }
-	
+	public void onDestroy() {
+		super.onDestroy();
+		if (imgEpCover != null) {
+			// Cancel any pending image work
+			ImageWorker.cancelWork(imgEpCover);
+			imgEpCover.setImageDrawable(null);
+		}
+
+		imgFetcher.closeCache();
+
+		if (ep.status == Ep.DOWNLOADING) {
+			unregisterReceiver(receiver);
+			downloadProgressUpdater.shutdownNow();
+		}
+	}
+
 	@Override
-    protected void onPause() {
-        super.onPause();
-        imgFetcher.setExitTasksEarly(true);
-        imgFetcher.flushCache();
-    }
-	
-    @Override
-    public void onResume() {
-        super.onResume();
-        imgFetcher.setExitTasksEarly(false);
-    }
+	protected void onPause() {
+		super.onPause();
+		imgFetcher.setExitTasksEarly(true);
+		imgFetcher.flushCache();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		imgFetcher.setExitTasksEarly(false);
+	}
 }

@@ -40,7 +40,7 @@ import com.jywave.AppMain;
  */
 public abstract class ImageWorker {
     private static final String TAG = "ImageWorker";
-    private static final int FADE_IN_TIME = 200;
+    private static final int FADE_IN_TIME = 400;
 
     private ImageCache mImageCache;
     private ImageCache.ImageCacheParams mImageCacheParams;
@@ -321,7 +321,10 @@ public abstract class ImageWorker {
                 if (AppMain.DEBUG) {
                     Log.d(TAG, "onPostExecute - setting bitmap");
                 }
-                setImageDrawable(imageView, value);
+                if((String)imageView.getTag() == (String)data)
+                {
+                	setImageDrawable(imageView, value);
+                }
             }
         }
 

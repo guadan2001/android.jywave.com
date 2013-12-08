@@ -30,7 +30,7 @@ public class EpsList{
 		}
 	}
 
-	public Ep getById(int id) {
+	public Ep getEpById(int id) {
 		for (int i = 0; i < data.size(); i++) {
 			if (data.get(i).id == id) {
 				return data.get(i);
@@ -48,6 +48,11 @@ public class EpsList{
 			}
 		}
 		return -1;
+	}
+	
+	public int size()
+	{
+		return data.size();
 	}
 
 }

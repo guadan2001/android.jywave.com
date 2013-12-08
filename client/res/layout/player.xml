@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pagePlayer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_player_back"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:background="@color/blue_app_main" >
+
+        <TextView
+            android:id="@+id/txtEpTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="60dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@color/transparent"
+            android:contentDescription="@string/playing"
+            android:src="@drawable/btn_appbar_back" />
+    </RelativeLayout>
+
+    <!-- shadow of app bar -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/dark_blue_1" >
+    </LinearLayout>
+
+    <!-- Labels of time eplased and time remaining -->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" >
+
+        <TextView
+            android:id="@+id/txtTimeElapsed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:text="@string/app_name"
+            android:textColor="@color/gray_text"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/txtTimeRemaining"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:text="@string/app_name"
+            android:textColor="@color/gray_text"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <SeekBar
+        android:id="@+id/seekbarPlaybackProgress"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="5dp"
+        android:maxHeight="5dp"
+        android:minHeight="5dp"
+        android:progress="30"
+        android:progressDrawable="@drawable/seekbar_playback"
+        android:thumb="@drawable/seekbar_thumb_playback"
+        android:thumbOffset="5dp" />
+
+    <!-- Share Button & Sleep Ctrl Button -->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/btnActionMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:layout_marginLeft="60dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_action_menu" />
+
+        <ImageButton
+            android:id="@+id/btnSleepTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:layout_marginRight="60dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_alarm_clock" />
+    </RelativeLayout>
+
+    <!-- top border of Ep Info -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_text" >
+    </LinearLayout>
+
+    <!-- Ep Info -->
+
+    <ViewFlipper
+        android:id="@+id/vflipperEpInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/imgEpCover"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitCenter"
+                android:src="@drawable/picture" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/llEpDescription"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical" >
+
+                <RatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:isIndicator="false"
+                    android:numStars="5"
+                    android:progressDrawable="@drawable/rating_bar_player"
+                    android:rating="0"
+                    android:stepSize="1" />
+
+                <TextView
+                    android:id="@+id/txtEpDescription"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/app_name"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </ScrollView>
+    </ViewFlipper>
+
+    <!-- bottom border of Ep Info -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_text" >
+    </LinearLayout>
+    
+    <!-- playback ctrl area -->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        >
+
+        <ImageButton
+            android:id="@+id/btnPlaybackPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="10dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_playback_pause" />
+        <ImageButton
+            android:id="@+id/btnPlaybackNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:padding="10dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_playback_next" />
+        <ImageButton
+            android:id="@+id/btnPlaybackPrev"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:padding="10dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_playback_prev" />
+        <ImageButton
+            android:id="@+id/btnPlaybackFF15s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="80dp"
+            android:padding="10dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_playback_ff_15s" />
+        <ImageButton
+            android:id="@+id/btnPlaybackFB15s"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="80dp"
+            android:padding="10dp"
+            android:background="@color/transparent"
+            android:src="@drawable/btn_playback_fb_15s" />
+        
+    </RelativeLayout>
+
+</LinearLayout>

@@ -21,7 +21,7 @@
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
 		<item name="android:background">@drawable/sel_bg_main_tab_eps</item>
-		<item name="android:drawableTop">@drawable/sel_ico_main_tab_eps</item>
+		<item name="android:drawableTop">@drawable/ico_main_tab_eps</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">wrap_content</item>
@@ -34,7 +34,7 @@
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
 		<item name="android:background">@drawable/sel_bg_main_tab_me</item>
-		<item name="android:drawableTop">@drawable/sel_ico_main_tab_me</item>
+		<item name="android:drawableTop">@drawable/ico_main_tab_me</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">wrap_content</item>
@@ -47,7 +47,7 @@
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
 		<item name="android:background">@drawable/sel_bg_main_tab_more</item>
-		<item name="android:drawableTop">@drawable/sel_ico_main_tab_more</item>
+		<item name="android:drawableTop">@drawable/ico_main_tab_more</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">wrap_content</item>
@@ -62,6 +62,11 @@
         <item name="android:progressDrawable">@drawable/progress_bar</item>  
         <item name="android:minHeight">12.0dp</item>  
         <item name="android:maxHeight">12.0dp</item>  
-    </style>  
+    </style>
+    
+	<style name="popup_menu">
+        <item name="android:windowEnterAnimation">@anim/popup_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/popup_to_bottom</item>
+    </style>
 
 </resources>

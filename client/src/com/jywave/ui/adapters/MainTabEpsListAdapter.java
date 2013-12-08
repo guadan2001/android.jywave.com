@@ -1,5 +1,10 @@
-package com.jywave;
+package com.jywave.ui.adapters;
 
+import com.jywave.AppMain;
+import com.jywave.R;
+import com.jywave.R.drawable;
+import com.jywave.R.id;
+import com.jywave.R.layout;
 import com.jywave.util.imagecache.ImageFetcher;
 import com.jywave.vo.Ep;
 import android.content.Context;
@@ -105,6 +110,7 @@ public class MainTabEpsListAdapter extends BaseAdapter {
 		}
 
 		viewHolder.imgEpCover = (ImageView) convertView.findViewById(R.id.imgEpCover);
+		viewHolder.imgEpCover.setTag(ep.coverThumbnailUrl);
 		imgFetcher.setImageFadeIn(true);
 		imgFetcher.loadImage(ep.coverThumbnailUrl, viewHolder.imgEpCover);
 

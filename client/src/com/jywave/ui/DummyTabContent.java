@@ -1,4 +1,4 @@
-package com.jywave;
+package com.jywave.ui;
 
 import android.content.Context;
 import android.view.View;

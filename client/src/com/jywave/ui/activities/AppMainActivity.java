@@ -1,5 +1,16 @@
-package com.jywave;
+package com.jywave.ui.activities;
 
+
+import com.jywave.AppMain;
+import com.jywave.R;
+import com.jywave.R.drawable;
+import com.jywave.R.id;
+import com.jywave.R.layout;
+import com.jywave.R.menu;
+import com.jywave.ui.DummyTabContent;
+import com.jywave.ui.fragments.MainTabEpsFragment;
+import com.jywave.ui.fragments.MainTabMeFragment;
+import com.jywave.ui.fragments.MainTabMoreFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

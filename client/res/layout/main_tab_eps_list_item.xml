@@ -10,7 +10,7 @@
         android:layout_height="60dp"
         android:layout_alignParentLeft="true"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/ep_cover" />
+        android:src="@drawable/picture" />
 
     <TextView
         android:id="@+id/txtEpTitle"
