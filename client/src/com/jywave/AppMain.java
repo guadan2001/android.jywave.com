@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import com.jywave.player.Player;
 import com.jywave.provider.EpProvider;
+import com.jywave.sql.DatabaseHelper;
 import com.jywave.util.imagecache.ImageCache.ImageCacheParams;
 import com.jywave.vo.Ep;
 import com.jywave.vo.EpsList;
@@ -16,6 +17,7 @@ import com.jywave.vo.EpsList;
 import android.R.integer;
 import android.app.Application;
 import android.app.DownloadManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.util.Log;
 
@@ -29,6 +31,7 @@ public class AppMain extends Application {
 	public Player player;
 
 	public EpsList epsList;
+	public int sumOfEps;
 	
 	public int latestClickedEpIndex;
 
@@ -41,7 +44,8 @@ public class AppMain extends Application {
 	public static final String imagesCacheDir = localStorageDir + "images/";
 
 	// Network
-	public String apiLocation = "http://android.jywave.com/";
+	public static final String apiHost = "192.168.0.100";
+	public static final String apiLocation = "http://192.168.0.100/api.jywave.com/";
 	public DownloadManager downloadManager;
 	
 	//Image Cache
@@ -60,7 +64,7 @@ public class AppMain extends Application {
 	//UI
 	public int listEpsScrollPosition = 0;
 	
-	
+
 
 	public static AppMain getInstance() {
 		return singleton;
@@ -75,18 +79,48 @@ public class AppMain extends Application {
 	}
 
 	public void init() {
-		epsList = new EpsList();
+		
 		downloadList = new HashMap<String, String>();
 		
 		latestClickedEpIndex = -1;
 		
-		EpProvider epSrv = new EpProvider();
+		//initEpList();
+		initLocalStorage();
+		initImageCache();
+		initConfiguration();
+	}
+	
+	public void initEpList()
+	{
+		epsList = new EpsList();
 		
-		for(int i=0;i<12;i++)
+		EpProvider epProvider = new EpProvider(this);
+		ArrayList<Ep> result = epProvider.getEps(0, 10);
+		if(result != null)
 		{
-			epsList.add(epSrv.getEp(i));
+			epsList.data = epProvider.getEps(0, 10);
 		}
-
+		else
+		{
+			epsList.data = new ArrayList<Ep>();
+		}
+		sumOfEps = epProvider.getEpCount();
+	}
+	
+	private void initImageCache()
+	{
+		cacheParams = new ImageCacheParams(this, "images");
+		cacheParams.setMemCacheSizePercent(0.25f);
+	}
+	
+	private void initConfiguration()
+	{
+		// Initialize Configuration
+		allowDownloadWithoutWifi = false;
+	}
+	
+	private void initLocalStorage()
+	{
 		File defaultDir = new File(localStorageDir);
 		if (!defaultDir.exists()) {
 			defaultDir.mkdir();
@@ -101,18 +135,10 @@ public class AppMain extends Application {
 		if (!imagesCacheDir.exists()) {
 			imagesCacheDir.mkdir();
 		}
-
-		if (AppMain.DEBUG) {
-			Log.d(TAG, "Local Storage DIR: " + AppMain.localStorageDir);
-		}
-
-		// Initialize Configuration
-		allowDownloadWithoutWifi = false;
-		
-		//set image cache parameters
-		cacheParams = new ImageCacheParams(this, "images");
-		cacheParams.setMemCacheSizePercent(0.25f);
-		
+	}
+	
+	public void initPlayer()
+	{
 		player = Player.getInstance();
 		player.refreshPlaylist();
 	}

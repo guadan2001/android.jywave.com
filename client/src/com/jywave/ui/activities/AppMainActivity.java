@@ -7,11 +7,14 @@ import com.jywave.R.drawable;
 import com.jywave.R.id;
 import com.jywave.R.layout;
 import com.jywave.R.menu;
+import com.jywave.sql.DatabaseHelper;
 import com.jywave.ui.DummyTabContent;
 import com.jywave.ui.fragments.MainTabEpsFragment;
 import com.jywave.ui.fragments.MainTabMeFragment;
 import com.jywave.ui.fragments.MainTabMoreFragment;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.DisplayMetrics;
@@ -43,7 +46,7 @@ public class AppMainActivity extends FragmentActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         app.screenHeight = displayMetrics.heightPixels;
         app.screenWidth = displayMetrics.widthPixels;
-		
+        
 		tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup();
 		
@@ -154,3 +157,5 @@ public class AppMainActivity extends FragmentActivity {
 		return true;
 	}
 }
+
+

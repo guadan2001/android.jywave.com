@@ -2,13 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white" >
+    android:background="@color/white"
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="60dp"
         android:background="@color/blue_app_main" >
+
+        <ImageButton
+            android:id="@+id/btnRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:background="@color/transparent"
+            android:visibility="gone"
+            android:contentDescription="@string/playing"
+            android:src="@drawable/btn_appbar_refresh" />
 
         <ImageView
             android:id="@+id/title"
@@ -36,11 +48,10 @@
         android:background="@color/dark_blue_1" >
     </LinearLayout>
 
-    <ListView
+    <com.jywave.ui.components.XListView
         android:id="@+id/listEps"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
-        >
-    </ListView>
+        android:layout_height="wrap_content" >
+    </com.jywave.ui.components.XListView>
 
 </LinearLayout>

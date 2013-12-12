@@ -191,6 +191,7 @@ public class EpDetailActivity extends FragmentActivity implements
 
 		btnDownloadCtrl.setOnClickListener(downloadCtrlListener);
 		btnDownloadCancel.setOnClickListener(downloadCancelListener);
+		btnClickToPlay.setOnClickListener(clickToPlayListener);
 
 		// gesture implementation
 		gestureDetector = new GestureDetector(this, this);
@@ -231,6 +232,18 @@ public class EpDetailActivity extends FragmentActivity implements
 			downloadProgressUpdater = Executors.newScheduledThreadPool(1);
 			downloadProgressUpdater.scheduleAtFixedRate(updateDownloadStatus,
 					0, 3, TimeUnit.SECONDS);
+		}
+	};
+	
+	private OnClickListener clickToPlayListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.putExtra("epIndex", index);
+			intent.setClass(thisContext, PlayerActivity.class);
+			startActivity(intent);
+			finish();
 		}
 	};
 

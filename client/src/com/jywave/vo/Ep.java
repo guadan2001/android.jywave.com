@@ -1,15 +1,20 @@
 package com.jywave.vo;
 
-import java.util.Date;
+import java.io.File;
+
+import com.jywave.AppMain;
 
 public class Ep {
 	public int id;
 	public String title;
 	public int duration;
+	public int sn;
+	public String category;
 	public int status;
 	public String description;
-	public Date publishDate;
+	public long publishDate;
 	public int star;
+	public int rating;
 	public String url;
 	public String coverUrl;
 	public String coverThumbnailUrl;
@@ -22,6 +27,11 @@ public class Ep {
 	public final static int DOWNLOADING = 1;
 	public final static int IN_LOCAL = 2;
 	public final static int PLAYING = 3;
+	
+	public static final String CAT_JYHADOUKEN = "jyhadouken";
+	public static final String CAT_JYSHOCK = "jyshock";
+	public static final String CAT_JYTECH = "jytech";
+	public static final String CAT_JYREADING = "jyreading";
 	
 	//convert seconds to string with "HH:mm:ss" format
 	public String getLengthString() {
@@ -71,5 +81,21 @@ public class Ep {
 	{
 		int i = url.lastIndexOf("/");
 		return url.substring(i+1, url.length());
+	}
+	
+	public void checkStatus()
+	{
+		if(url != null)
+		{
+			File f = new File(AppMain.mp3StorageDir + getEpFilename());
+			if(f.exists())
+			{
+				status = Ep.IN_LOCAL;
+			}
+			else
+			{
+				status = Ep.IN_SERVER;
+			}
+		}
 	}
 }

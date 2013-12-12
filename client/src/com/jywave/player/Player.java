@@ -85,6 +85,14 @@ public class Player {
 						app.epsList.data.get(i).status = Ep.IN_LOCAL;
 					}
 				}
+				
+				if(isPlaying)
+				{
+					if(playingId == app.epsList.data.get(i).id)
+					{
+						app.epsList.data.get(i).status = Ep.PLAYING;
+					}
+				}
 			}
 		}
 
@@ -130,10 +138,8 @@ public class Player {
 				playingIndexOfPlaylist = 0;
 			}
 			int epId = playlist.get(playingIndexOfPlaylist);
-			playingIndexOfEpList = app.epsList.findIndexById(epId);
-			playingId = epId;
 			
-			play(app.epsList.data.get(playingIndexOfEpList));
+			play(app.epsList.getEpById(epId));
 		}
 	}
 	
@@ -151,10 +157,7 @@ public class Player {
 			}
 			
 			int epId = playlist.get(playingIndexOfPlaylist);
-			playingIndexOfEpList = app.epsList.findIndexById(epId);
-			playingId = epId;
-			
-			play(app.epsList.data.get(playingIndexOfEpList));
+			play(app.epsList.getEpById(epId));
 		}
 	}
 }
