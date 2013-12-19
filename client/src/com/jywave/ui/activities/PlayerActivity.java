@@ -2,6 +2,8 @@ package com.jywave.ui.activities;
 
 import java.io.File;
 
+import net.tsz.afinal.FinalBitmap;
+
 import com.jywave.AppMain;
 import com.jywave.R;
 import com.jywave.R.anim;
@@ -10,7 +12,6 @@ import com.jywave.R.layout;
 import com.jywave.player.Player;
 import com.jywave.player.PlayerService;
 import com.jywave.util.StringUtil;
-import com.jywave.util.imagecache.ImageFetcher;
 import com.jywave.vo.Ep;
 
 import android.app.AlertDialog;
@@ -81,7 +82,7 @@ public class PlayerActivity extends FragmentActivity {
 	private PopupWindow menuSleepTimer;
 	private View viewMenuSleepTimer;
 
-	private ImageFetcher imgFetcher;
+	private FinalBitmap fb;
 
 	// player service
 	private PlayerActivityReceiver playerActivityReceiver;
@@ -118,12 +119,6 @@ public class PlayerActivity extends FragmentActivity {
 		ep = app.epsList.data.get(index);
 
 		app.latestClickedEpIndex = index;
-
-		// Load EP Cover
-		imgFetcher = new ImageFetcher(this, app.screenWidth);
-		imgFetcher.addImageCache(this.getSupportFragmentManager(),
-				app.cacheParams);
-		imgFetcher.setImageFadeIn(true);
 
 		// setup all UI elements
 		refreshUI();
@@ -313,6 +308,25 @@ public class PlayerActivity extends FragmentActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(playerActivityReceiver);
+		try {
+			fb.exitTasksEarly(true);
+			fb.closeCache();
+			fb.onDestroy();
+			fb = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	};
+	
+	@Override
+	protected void onResume() {
+		fb.onResume();
+	};
+	
+	@Override
+	protected void onPause() {
+		fb.onPause();
 	};
 
 	private OnClickListener listenerSwitchEpInfo = new OnClickListener() {
@@ -355,7 +369,11 @@ public class PlayerActivity extends FragmentActivity {
 		txtEpDescription.setText(ep.description);
 
 		imgEpCover.setTag(ep.coverUrl);
-		imgFetcher.loadImage(ep.coverUrl, imgEpCover);
+		
+		// Load EP Cover
+		fb = FinalBitmap.create(this);
+		fb.configDiskCachePath(AppMain.imagesCacheDir);
+		fb.display(imgEpCover, ep.coverUrl);
 	}
 
 	private void play() {

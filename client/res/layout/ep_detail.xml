@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pageEpDetail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical"
-    android:id="@+id/pageEpDetail" >
+    android:orientation="vertical" >
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:background="@color/blue_app_main" >
 
-        <ImageView
-            android:id="@+id/appTitle"
+        <TextView
+            android:id="@+id/txtEpTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:contentDescription="@string/jywave_title_en"
-            android:src="@drawable/app_bar_title_en" />
+            android:text="@string/more"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
@@ -31,7 +32,7 @@
 
         <ImageButton
             android:id="@+id/btnPlaying"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -59,24 +60,25 @@
             android:background="@color/white"
             android:orientation="vertical" >
 
-            <TextView
+            <!-- <TextView
                 android:id="@+id/txtEpTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/app_name"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp" /> -->
 
             <ImageView
                 android:id="@+id/imgEpCover"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"
-                android:src="@drawable/picture" />
+                android:background="@color/blue_app_main"
+                android:src="@drawable/picture"
+                 />
 
             <RelativeLayout
                 android:layout_width="fill_parent"
@@ -119,7 +121,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/sel_bg_btn_download"
+                android:background="@drawable/btn_download_bg"
                 android:clickable="true"
                 android:gravity="center" >
 
@@ -145,7 +147,7 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/sel_bg_btn_delete"
+                android:background="@drawable/btn_delete_bg"
                 android:clickable="true"
                 android:gravity="center" >
 
@@ -164,14 +166,14 @@
                     android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>
-            
+
             <LinearLayout
                 android:id="@+id/btnClickToPlay"
                 android:layout_width="fill_parent"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/sel_bg_btn_click_to_play"
+                android:background="@drawable/btn_click_to_play_bg"
                 android:clickable="true"
                 android:gravity="center" >
 

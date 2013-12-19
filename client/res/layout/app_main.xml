@@ -46,22 +46,28 @@
                     style="@style/main_tab_eps"
                     android:layout_weight="1.0"
                     android:drawablePadding="10dp"
-                    android:text="节目" />
+                    android:text="@string/eps" />
 
+                <RadioButton
+                    android:id="@+id/main_tab_podcasters"
+                    style="@style/main_tab_podcasters"
+                    android:layout_weight="1.0"
+                    android:drawablePadding="10dp"
+                    android:text="@string/podcasters" />
+                
                 <RadioButton
                     android:id="@+id/main_tab_me"
                     style="@style/main_tab_me"
                     android:layout_weight="1.0"
-                    android:checked="true"
                     android:drawablePadding="10dp"
-                    android:text="我" />
+                    android:text="@string/me" />
 
                 <RadioButton
                     android:id="@+id/main_tab_more"
                     style="@style/main_tab_more"
                     android:layout_weight="1.0"
                     android:drawablePadding="10dp"
-                    android:text="更多" />
+                    android:text="@string/more" />
             </RadioGroup>
 
             <!--

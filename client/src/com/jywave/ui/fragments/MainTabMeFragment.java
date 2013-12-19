@@ -2,8 +2,6 @@ package com.jywave.ui.fragments;
 
 import com.jywave.AppMain;
 import com.jywave.R;
-import com.jywave.R.id;
-import com.jywave.R.layout;
 import com.jywave.player.Player;
 import com.jywave.ui.activities.PlayerActivity;
 

@@ -2,18 +2,7 @@ package com.jywave.ui.fragments;
 
 import java.util.ArrayList;
 
-import com.jywave.AppMain;
-import com.jywave.R;
-import com.jywave.player.Player;
-import com.jywave.provider.EpProvider;
-import com.jywave.ui.activities.EpDetailActivity;
-import com.jywave.ui.activities.PlayerActivity;
-import com.jywave.ui.adapters.MainTabEpsListAdapter;
-import com.jywave.ui.components.XListView;
-import com.jywave.ui.components.XListView.IXListViewListener;
-import com.jywave.util.imagecache.ImageFetcher;
-import com.jywave.vo.Ep;
-
+import net.tsz.afinal.FinalBitmap;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,21 +12,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AbsListView;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.jywave.AppMain;
+import com.jywave.R;
+import com.jywave.player.Player;
+import com.jywave.provider.EpProvider;
+import com.jywave.ui.activities.EpDetailActivity;
+import com.jywave.ui.activities.PlayerActivity;
+import com.jywave.ui.components.XListView;
+import com.jywave.ui.components.XListView.IXListViewListener;
+import com.jywave.util.CommonUtil;
+import com.jywave.vo.Ep;
 
 public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	
 	private static final String TAG = "MainTabepsFragment";
 
-	private XListView listEps;
 	private AppMain app = AppMain.getInstance();
 	private Player player = Player.getInstance();
 	
@@ -46,14 +46,16 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	private ImageButton btnPlaying;
 
 	private MainTabEpsListAdapter epsAdapter;
-
-	private ImageFetcher imgFetcher;
+	private XListView listEps;
+	
+	private FinalBitmap fb;
 	
 	private boolean isRefreshing = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		Log.d(TAG, "onCreateView");
 		View view = inflater.inflate(R.layout.main_tab_eps, container, false);
 		thisContext = this.getActivity();
 
@@ -68,22 +70,26 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 		if (!player.isPlaying) {
 			btnPlaying.setVisibility(View.GONE);
 		}
-
-		// The ImageFetcher takes care of loading images into our ImageView
-		// children asynchronously
-		imgFetcher = new ImageFetcher(getActivity(), getResources()
-				.getDimensionPixelSize(R.dimen.ep_cover_thumbnail));
-		imgFetcher.setLoadingImage(R.drawable.picture);
-		imgFetcher.addImageCache(getActivity().getSupportFragmentManager(),
-				app.cacheParams);
 		
-		epsAdapter = new MainTabEpsListAdapter(this.getActivity()
-				.getApplicationContext(), imgFetcher);
+		fb = FinalBitmap.create(this.getActivity());
+		fb.configLoadingImage(R.drawable.picture);
+		fb.configDiskCachePath(AppMain.imagesCacheDir);
+
+		epsAdapter = new MainTabEpsListAdapter(this.getActivity().getApplicationContext());
 		
 		if(app.sumOfEps == 0 && !isRefreshing)
 		{
-			RefreshEpsTask task = new RefreshEpsTask();
-			task.execute(new Void[]{});
+			if(CommonUtil.checkNetState(thisContext))
+			{
+				RefreshEpsTask task = new RefreshEpsTask();
+				task.execute(new Void[]{});
+			}
+			else
+			{
+				listEps.stopRefresh();
+				Toast.makeText(thisContext, "亲，你的网络貌似没有连接，请检查一下再来", Toast.LENGTH_LONG).show();
+			}
+			
 		}
 		
 		listEps.setAdapter(epsAdapter);
@@ -142,11 +148,10 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	@Override
 	public void onResume() {
 		super.onResume();
+		fb.onResume();
 
 		epsAdapter.notifyDataSetChanged();
 
-		imgFetcher.setExitTasksEarly(false);
-		
 		listEps.setSelection(app.listEpsScrollPosition);
 		
 	}
@@ -159,15 +164,21 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	@Override
 	public void onPause() {
 		super.onPause();
-		imgFetcher.setPauseWork(false);
-		imgFetcher.setExitTasksEarly(true);
-		imgFetcher.flushCache();
+		fb.onPause();
 	}
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-		imgFetcher.closeCache();
+		try {
+			super.onDestroy();
+			fb.exitTasksEarly(true);
+			fb.closeCache();
+			fb.onDestroy();
+			fb = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	@Override
@@ -189,22 +200,18 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	public void onRefresh() {
 		if(!isRefreshing)
 		{
-			RefreshEpsTask task = new RefreshEpsTask();
-			task.execute(new Void[]{});
+			if(CommonUtil.checkNetState(thisContext))
+			{
+				RefreshEpsTask task = new RefreshEpsTask();
+				task.execute(new Void[]{});
+			}
+			else
+			{
+				listEps.stopRefresh();
+				Toast.makeText(thisContext, "亲，你的网络貌似没有连接，请检查一下再来", Toast.LENGTH_LONG).show();
+			}
 		}
 	}
-
-	
-//	private void refreshEps()
-//	{
-//		Animation aniCounterclockwiseRotation = AnimationUtils
-//				.loadAnimation(this.getActivity(), R.anim.counterclockwise_rotation_infinite);
-//		btnRefresh.startAnimation(aniCounterclockwiseRotation);
-//		btnRefresh.setClickable(false);
-//		
-//		RefreshEpsTask task = new RefreshEpsTask();
-//		task.execute(new Void[]{});
-//	}
 	
 	class RefreshEpsTask extends AsyncTask<Void, Void, Void>
 	{
@@ -255,5 +262,110 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 		}
 	}
 
-	
+	private class MainTabEpsListAdapter extends BaseAdapter {
+
+		private static final String TAG = "MainTabEpsListAdapter";
+
+		private LayoutInflater listContainer;
+
+		private AppMain app = AppMain.getInstance();
+		private Ep ep;
+
+		private ViewHolder viewHolder;
+
+		public MainTabEpsListAdapter(Context context) {
+			listContainer = LayoutInflater.from(context);
+		}
+
+		public int getCount() {
+			return app.epsList.data.size();
+		}
+
+		public Object getItem(int arg0) {
+			return null;
+		}
+
+		public long getItemId(int arg0) {
+			return 0;
+		}
+
+		public View getView(int i, View convertView, ViewGroup parent) {
+
+			if (convertView == null) {
+				convertView = listContainer.inflate(R.layout.main_tab_eps_list_item, null);
+				
+				viewHolder = new ViewHolder();
+				viewHolder.txtEpTitle = (TextView) convertView.findViewById(R.id.txtEpTitle);
+				viewHolder.txtEpLength = (TextView) convertView.findViewById(R.id.txtEpLength);
+				viewHolder.txtEpStatus = (TextView) convertView.findViewById(R.id.txtEpStatus);
+				viewHolder.imgEpIsNew = (ImageView) convertView.findViewById(R.id.imgEpNewMark);
+				viewHolder.imgEpStar = (ImageView) convertView.findViewById(R.id.imgEpStar);
+				viewHolder.imgEpCover = (ImageView) convertView.findViewById(R.id.imgEpCover);
+				
+				convertView.setTag(viewHolder);
+			} else {
+				viewHolder = (ViewHolder) convertView.getTag();
+			}
+
+			ep = app.epsList.data.get(i);
+
+			viewHolder.txtEpTitle.setText(ep.title);
+			viewHolder.txtEpLength.setText(ep.getLengthString());
+
+			if (ep.isNew) {
+				viewHolder.imgEpIsNew.setVisibility(View.VISIBLE);
+			} else {
+				viewHolder.imgEpIsNew.setVisibility(View.GONE);
+			}
+
+			switch (ep.status) {
+			case Ep.IN_SERVER:
+				viewHolder.txtEpStatus.setVisibility(View.GONE);
+				break;
+			case Ep.IN_LOCAL:
+				viewHolder.txtEpStatus.setText("已下载");
+				break;
+			case Ep.DOWNLOADING:
+				viewHolder.txtEpStatus.setText("已下载" + String.valueOf(ep.downloadProgress)
+						+ "%");
+				break;
+			case Ep.PLAYING:
+				viewHolder.txtEpStatus.setText("正在播放");
+				break;
+			}
+
+			switch (ep.star) {
+			case 1:
+				viewHolder.imgEpStar.setImageResource(R.drawable.star1);
+				break;
+			case 2:
+				viewHolder.imgEpStar.setImageResource(R.drawable.star2);
+				break;
+			case 3:
+				viewHolder.imgEpStar.setImageResource(R.drawable.star3);
+				break;
+			case 4:
+				viewHolder.imgEpStar.setImageResource(R.drawable.star4);
+				break;
+			case 5:
+				viewHolder.imgEpStar.setImageResource(R.drawable.star5);
+				break;
+			}
+
+			viewHolder.imgEpCover.setTag(ep.coverThumbnailUrl);
+			fb.display(viewHolder.imgEpCover, ep.coverThumbnailUrl);
+
+			return convertView;
+		}
+
+		private class ViewHolder {
+			public TextView txtEpTitle;
+			public TextView txtEpLength;
+			public TextView txtEpStatus;
+			public ImageView imgEpCover;
+			public ImageView imgEpIsNew;
+			public ImageView imgEpStar;
+		}
+
+	}
 }

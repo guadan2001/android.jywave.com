@@ -5,18 +5,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import net.tsz.afinal.FinalBitmap;
+
 import com.jywave.AppMain;
 import com.jywave.R;
-import com.jywave.R.anim;
-import com.jywave.R.dimen;
-import com.jywave.R.drawable;
-import com.jywave.R.id;
-import com.jywave.R.layout;
 import com.jywave.player.Player;
 import com.jywave.util.NetUtil;
 import com.jywave.util.StringUtil;
-import com.jywave.util.imagecache.ImageFetcher;
-import com.jywave.util.imagecache.ImageWorker;
 import com.jywave.vo.DownloadItem;
 import com.jywave.vo.Ep;
 
@@ -31,17 +26,20 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -49,6 +47,8 @@ import android.widget.Toast;
 
 public class EpDetailActivity extends FragmentActivity implements
 		OnGestureListener, OnTouchListener {
+
+	private static final String TAG = "EpDetailActivity";
 
 	private LinearLayout pageEpDetail;
 	private TextView txtEpTitle;
@@ -75,7 +75,7 @@ public class EpDetailActivity extends FragmentActivity implements
 
 	private GestureDetector gestureDetector;
 
-	private ImageFetcher imgFetcher;
+	private FinalBitmap fb;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +104,6 @@ public class EpDetailActivity extends FragmentActivity implements
 
 		// Set EP Data
 		ep = app.epsList.data.get(index);
-
 		app.latestClickedEpIndex = index;
 
 		// Set Texts
@@ -116,14 +115,10 @@ public class EpDetailActivity extends FragmentActivity implements
 		btnClickToPlay.setVisibility(View.GONE);
 
 		// Load EP Cover
-		imgFetcher = new ImageFetcher(this, app.screenWidth
-				- getResources().getDimensionPixelSize(
-						R.dimen.page_ep_detail_margin) * 2);
-		imgFetcher.addImageCache(this.getSupportFragmentManager(),
-				app.cacheParams);
-		imgFetcher.setImageFadeIn(true);
+		fb = FinalBitmap.create(this);
+		fb.configDiskCachePath(AppMain.imagesCacheDir);
 		imgEpCover.setTag(ep.coverUrl);
-		imgFetcher.loadImage(ep.coverUrl, imgEpCover);
+		fb.display(imgEpCover, ep.coverUrl);
 
 		// Ep rank
 		switch (ep.star) {
@@ -199,6 +194,17 @@ public class EpDetailActivity extends FragmentActivity implements
 		pageEpDetail.setLongClickable(true);
 
 	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus){
+	    int width = imgEpCover.getWidth();
+	    
+	    LayoutParams lp = imgEpCover.getLayoutParams();
+		lp.height = width;
+		lp.width = width;
+		imgEpCover.setLayoutParams(lp);
+	    
+	}
 
 	private OnClickListener downloadCtrlListener = new OnClickListener() {
 
@@ -234,9 +240,9 @@ public class EpDetailActivity extends FragmentActivity implements
 					0, 3, TimeUnit.SECONDS);
 		}
 	};
-	
+
 	private OnClickListener clickToPlayListener = new OnClickListener() {
-		
+
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
@@ -428,30 +434,31 @@ public class EpDetailActivity extends FragmentActivity implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (imgEpCover != null) {
-			// Cancel any pending image work
-			ImageWorker.cancelWork(imgEpCover);
-			imgEpCover.setImageDrawable(null);
-		}
-
-		imgFetcher.closeCache();
 
 		if (ep.status == Ep.DOWNLOADING) {
 			unregisterReceiver(receiver);
 			downloadProgressUpdater.shutdownNow();
+		}
+		
+		try {
+			fb.exitTasksEarly(true);
+			fb.closeCache();
+			fb.onDestroy();
+			fb = null;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		imgFetcher.setExitTasksEarly(true);
-		imgFetcher.flushCache();
+		fb.onPause();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		imgFetcher.setExitTasksEarly(false);
+		fb.onResume();
 	}
 }

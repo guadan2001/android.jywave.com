@@ -3,29 +3,27 @@ package com.jywave;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-
 import com.jywave.player.Player;
 import com.jywave.provider.EpProvider;
-import com.jywave.sql.DatabaseHelper;
-import com.jywave.util.imagecache.ImageCache.ImageCacheParams;
+import com.jywave.provider.PodcasterProvider;
 import com.jywave.vo.Ep;
 import com.jywave.vo.EpsList;
+import com.jywave.vo.Podcaster;
+import com.jywave.vo.PodcastersList;
 
-import android.R.integer;
 import android.app.Application;
 import android.app.DownloadManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.util.Log;
 
 public class AppMain extends Application {
 
 	public static AppMain singleton;
-	public static final String TAG = "App Main";
-	public static final boolean DEBUG = false;
+	public static final String TAG = "AppMain";
+	public static final boolean DEBUG = true;
+	public static final String deviceCategory = "android";
+	
+	public int userId = 0;
 	
 	// Music Player
 	public Player player;
@@ -34,6 +32,8 @@ public class AppMain extends Application {
 	public int sumOfEps;
 	
 	public int latestClickedEpIndex;
+	
+	public PodcastersList podcastersList;
 
 	// Download Manager Reference Id to EP's index in epList
 	public Map<String, String> downloadList;
@@ -48,9 +48,6 @@ public class AppMain extends Application {
 	public static final String apiLocation = "http://192.168.0.100/api.jywave.com/";
 	public DownloadManager downloadManager;
 	
-	//Image Cache
-	public ImageCacheParams cacheParams; // Set memory cache to 25% of app memory
-
 	// Configuration
 	public boolean allowDownloadWithoutWifi;
 	
@@ -63,6 +60,12 @@ public class AppMain extends Application {
 	
 	//UI
 	public int listEpsScrollPosition = 0;
+	
+	//Websites
+	public String urlOfficialSite = "http://www.jywave.com/";
+	public String urlSinaWeibo = "http://weibo.com/jiangyouwave";
+	public String urlRenrenSite = "http://zhan.renren.com/jiangyouwave";
+	public String urlDoubanSite = "http://site.douban.com/136913/";
 	
 
 
@@ -84,9 +87,7 @@ public class AppMain extends Application {
 		
 		latestClickedEpIndex = -1;
 		
-		//initEpList();
 		initLocalStorage();
-		initImageCache();
 		initConfiguration();
 	}
 	
@@ -107,10 +108,17 @@ public class AppMain extends Application {
 		sumOfEps = epProvider.getEpCount();
 	}
 	
-	private void initImageCache()
+	public void initPodcastersList()
 	{
-		cacheParams = new ImageCacheParams(this, "images");
-		cacheParams.setMemCacheSizePercent(0.25f);
+		podcastersList = new PodcastersList();
+		
+		PodcasterProvider podcasterProvider = new PodcasterProvider(this);
+		ArrayList<Podcaster> result = podcasterProvider.getAllPodcasters();
+		
+		if(result != null)
+		{
+			podcastersList.setData(result);
+		}
 	}
 	
 	private void initConfiguration()

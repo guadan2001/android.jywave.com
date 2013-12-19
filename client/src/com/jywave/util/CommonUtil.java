@@ -4,11 +4,19 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 public class CommonUtil {
+	
+	private Context context;
+	
+	public CommonUtil(Context context)
+	{
+		this.context = context;
+	}
 
 	public static boolean hasSDCard() {
 		String status = Environment.getExternalStorageState();
@@ -50,6 +58,29 @@ public class CommonUtil {
 	public static void showToask(Context context, String tip){
 		Toast.makeText(context, tip, Toast.LENGTH_SHORT).show();
 	}
+	
+	public String getDeviceIMEI()
+	{
+		TelephonyManager telephonyManager=(TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		return telephonyManager.getDeviceId();
+	}
+	
+	public String getDeviceModel()
+	{
+		return android.os.Build.MODEL;
+	}
+	
+	public String getSystemVersion()
+	{
+		return android.os.Build.VERSION.RELEASE;
+	}
+	
+	public String getDeviceManufacturer()
+	{
+		return android.os.Build.MANUFACTURER;
+	}
+	
+	
 
 //	public static int getScreenWidth(Context context) {
 //		WindowManager manager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);

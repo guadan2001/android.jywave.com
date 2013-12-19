@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:background="@color/blue_app_main" >
 
         <TextView
@@ -22,7 +22,7 @@
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="fill_parent"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
@@ -72,16 +72,18 @@
     <SeekBar
         android:id="@+id/seekbarPlaybackProgress"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="5dp"
-        android:maxHeight="5dp"
-        android:minHeight="5dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:maxHeight="6dp"
+        android:minHeight="6dp"
         android:progress="30"
         android:progressDrawable="@drawable/seekbar_playback"
         android:thumb="@drawable/seekbar_thumb_playback"
-        android:thumbOffset="5dp" />
+        android:thumbOffset="12dp"
+        />
 
     <!-- Share Button & Sleep Ctrl Button -->
 

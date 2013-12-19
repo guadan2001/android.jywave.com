@@ -1,5 +1,6 @@
 package com.jywave.provider;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -19,6 +20,7 @@ import com.jywave.AppMain;
 import com.jywave.net.ApiRequest;
 import com.jywave.net.ApiResponse;
 import com.jywave.sql.DatabaseHelper;
+import com.jywave.util.StringUtil;
 import com.jywave.vo.Ep;
 
 public class EpProvider {
@@ -272,8 +274,6 @@ public class EpProvider {
 	}
 
 	public void sync() {
-		//TODO: Delete "clear()" here.
-		//clear();
 		try {
 			ApiRequest request = new ApiRequest();
 			ApiResponse response = request.get(AppMain.apiLocation
@@ -292,19 +292,65 @@ public class EpProvider {
 
 				if (c.getCount() > 0) {
 					ArrayList<String> epIdToUpdate = new ArrayList<String>();
-
-					c.moveToFirst();
-					for (int i = 0; i < list.length(); i++) {
-						JSONObject epJson = list.getJSONObject(i);
-
-						if (c.getString(c.getColumnIndex("id")).equals(epJson.getString("id"))) {
-							if (!c.getString(c.getColumnIndex("publishDate")).equals(epJson.getString("publishDate"))) {
-
-								epIdToUpdate.add(c.getString(c
-										.getColumnIndex("id")));
-							}
-							c.moveToNext();
+					
+					int lengthJson = list.length();
+					int lengthDb = c.getCount();
+					int i = 0, j = 0;
+					
+					for(i = 0; i < lengthJson; i++)
+					{
+						if(j >= lengthDb)
+						{
+							break;
 						}
+						else
+						{
+							c.moveToPosition(j);
+						}
+						JSONObject epJson = list.getJSONObject(i);
+						int idDB = c.getInt(c.getColumnIndex("id"));
+						int idJSON = epJson.getInt("id");
+						
+						if(j < lengthDb)
+						{
+							if (idDB == idJSON) {
+								if (!c.getString(c.getColumnIndex("publishDate")).equals(epJson.getString("publishDate"))) {
+
+									epIdToUpdate.add(String.valueOf(idJSON));
+								}
+								j++;
+							}
+							else if(idDB < idJSON)
+							{
+								//Delete the file firstly, because the deleteFromDisk() must query the filename from db.
+								deleteFromDisk(idDB);
+								deleteFromDB(idDB);
+								epIdToUpdate.add(String.valueOf(idJSON));
+								j++;
+							}
+							else
+							{
+								epIdToUpdate.add(String.valueOf(idJSON));
+							}
+						}
+					}
+					
+					while(j < lengthDb)
+					{
+						c.moveToPosition(j);
+						int id = c.getInt(c.getColumnIndex("id"));
+						//Delete the file firstly, because the deleteFromDisk() must query the filename from db.
+						deleteFromDisk(id);
+						deleteFromDB(id);
+						j++;
+						
+					}
+
+					while(i < lengthJson)
+					{
+						String id = list.getJSONObject(i).getString("id");
+						epIdToUpdate.add(id);
+						i++;
 					}
 					
 					Log.d(TAG, "epIdToUpdate: " + String.valueOf(epIdToUpdate.size()));
@@ -312,7 +358,7 @@ public class EpProvider {
 					if(epIdToUpdate.size() > 0)
 					{
 						String requestBody = "{\"ids\":[" + epIdToUpdate.get(0);
-						for(int i=1; i<epIdToUpdate.size();i++)
+						for(i=1; i<epIdToUpdate.size();i++)
 						{
 							requestBody = requestBody + ", " + epIdToUpdate.get(i);
 						}
@@ -327,7 +373,7 @@ public class EpProvider {
 						if (response.httpCode == 200) {
 							list = response.json.getJSONArray("eps");
 
-							for (int i = 0; i < list.length(); i++) {
+							for (i = 0; i < list.length(); i++) {
 								save(list.getJSONObject(i));
 							}
 						} else {
@@ -385,6 +431,45 @@ public class EpProvider {
 		} catch (SQLException e) {
 			db.close();
 			Log.e(TAG, e.toString());
+		}
+	}
+	
+	private void deleteFromDB(int id)
+	{
+		SQLiteDatabase db = database.getWritableDatabase();
+		try {
+			db.delete("eps", "id=?", new String[]{String.valueOf(id)});
+			db.close();
+		} catch (SQLException e) {
+			Log.e(TAG, e.toString());
+			db.close();
+		}
+	}
+	
+	private void deleteFromDisk(int id)
+	{
+		SQLiteDatabase db = database.getReadableDatabase();
+		Cursor c = db.rawQuery("SELECT * FROM eps WHERE id=?",
+				new String[] { String.valueOf(id) });
+		try {
+			if(c.moveToFirst())
+			{
+				String filename = StringUtil.getFilenameFromUrl(c.getString(c.getColumnIndex("url")));
+				
+				File f = new File(AppMain.mp3StorageDir + filename);
+				if(f.exists())
+				{
+					Log.d(TAG, "Deleting ep from disk: " + AppMain.mp3StorageDir + filename);
+					f.delete();
+				}
+			}
+			c.close();
+			db.close();
+			
+		} catch (SQLException e) {
+			Log.e(TAG, e.toString());
+			c.close();
+			db.close();
 		}
 	}
 	

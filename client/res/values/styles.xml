@@ -20,7 +20,7 @@
      <style name="main_tab_eps">
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
-		<item name="android:background">@drawable/sel_bg_main_tab_eps</item>
+		<item name="android:background">@drawable/main_tab_eps_bg</item>
 		<item name="android:drawableTop">@drawable/ico_main_tab_eps</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>
@@ -30,10 +30,23 @@
 		<item name="android:paddingBottom">10.0dip</item>
 		<item name="android:paddingTop">10.0dip</item>
 	</style>
+	<style name="main_tab_podcasters">
+		<item name="android:textSize">12.0dip</item>
+		<item name="android:gravity">center_horizontal</item>
+		<item name="android:background">@drawable/main_tab_podcaster_bg</item>
+		<item name="android:drawableTop">@drawable/ico_main_tab_podcasters</item>
+		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:button">@null</item>
+		<item name="android:layout_weight">1.0</item>
+		<item name="android:paddingBottom">10.0dip</item>
+		<item name="android:paddingTop">10.0dip</item>
+	</style>
 	<style name="main_tab_me">
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
-		<item name="android:background">@drawable/sel_bg_main_tab_me</item>
+		<item name="android:background">@drawable/main_tab_me_bg</item>
 		<item name="android:drawableTop">@drawable/ico_main_tab_me</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>
@@ -46,7 +59,7 @@
 	<style name="main_tab_more">
 		<item name="android:textSize">12.0dip</item>
 		<item name="android:gravity">center_horizontal</item>
-		<item name="android:background">@drawable/sel_bg_main_tab_more</item>
+		<item name="android:background">@drawable/main_tab_more_bg</item>
 		<item name="android:drawableTop">@drawable/ico_main_tab_more</item>
 		<item name="android:textColor">@color/sel_txt_color_main_tab</item>
 		<item name="android:layout_width">fill_parent</item>

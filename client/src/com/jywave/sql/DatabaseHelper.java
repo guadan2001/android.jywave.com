@@ -3,7 +3,6 @@ package com.jywave.sql;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper {
@@ -19,6 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
  
     @Override
     public void onCreate(SQLiteDatabase db) {
+    	
         String sql = "CREATE TABLE IF NOT EXISTS `eps` ( " +
         		"`id` INTEGER PRIMARY KEY NOT NULL,  " +
         		"`title` TEXT NOT NULL,  " +
@@ -34,6 +34,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         		"`coverThumbnailUrl` TEXT NOT NULL,  " +
         		"`isNew` INTEGER NOT NULL default '0');";
         db.execSQL(sql);
+        
+        sql = "CREATE TABLE IF NOT EXISTS `podcasters` ( " +
+        		"`id` INTEGER PRIMARY KEY NOT NULL,  " +
+        		"`name` TEXT NOT NULL,  " +
+        		"`description` TEXT NOT NULL,  " +
+        		"`heart` INTEGER NOT NULL,  " +
+        		"`avatarUrl` TEXT NOT NULL,  " +
+        		"`updateTime` INTEGER NOT NULL, " +
+        		"`iLikeIt` INTEGER NOT NULL default '0');";
+        db.execSQL(sql);
+        
     }
  
     @Override

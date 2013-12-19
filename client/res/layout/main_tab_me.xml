@@ -6,24 +6,25 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:background="@color/blue_app_main" >
 
-        <ImageView
-            android:id="@+id/title"
+        <TextView
+            android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/app_bar_title_cn" />
+            android:text="@string/me"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            />
 
         <ImageButton
             android:id="@+id/btnPlaying"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
             android:background="@color/transparent"
             android:contentDescription="@string/playing"
             android:src="@drawable/btn_appbar_playing" />
@@ -34,11 +35,48 @@
         android:layout_height="3dp"
         android:background="@color/dark_blue_1" >
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+    
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Here is tabMe" />
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/option_group_layout"
+        android:divider="@color/gray_text"
+        android:orientation="vertical"
+        android:showDividers="middle" >
+
+        <RelativeLayout
+            android:id="@+id/optMyDownloads"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/list_item_bg"
+            android:clickable="true" >
+
+            <TextView
+                android:id="@+id/txtMyDownloads"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:text="@string/my_downloads"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ico_option_arrow_right" >
+            </ImageView>
+        </RelativeLayout>
+
+        
+    </LinearLayout>
+
+
 
 </LinearLayout>

@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -10,27 +9,14 @@
         android:layout_height="50dp"
         android:background="@color/blue_app_main" >
 
-        <ImageButton
-            android:id="@+id/btnRefresh"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:background="@color/transparent"
-            android:visibility="gone"
-            android:contentDescription="@string/playing"
-            android:src="@drawable/btn_appbar_refresh" />
-        
         <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/eps"
+            android:text="@string/podcasters"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            />
+            android:textSize="18sp" />
 
         <ImageButton
             android:id="@+id/btnPlaying"
@@ -41,7 +27,6 @@
             android:background="@color/transparent"
             android:contentDescription="@string/playing"
             android:src="@drawable/btn_appbar_playing" />
-
     </RelativeLayout>
 
     <LinearLayout
@@ -51,9 +36,11 @@
     </LinearLayout>
 
     <com.jywave.ui.components.XListView
-        android:id="@+id/listEps"
+        android:id="@+id/listPodcasters"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        >
     </com.jywave.ui.components.XListView>
 
 </LinearLayout>

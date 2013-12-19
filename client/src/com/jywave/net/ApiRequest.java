@@ -67,7 +67,7 @@ public class ApiRequest {
 			HttpPost httppost = new HttpPost(url);
 			httppost.setHeader("Content-Type", "application/json");
 
-			StringEntity se = new StringEntity(json.toString());
+			StringEntity se = new StringEntity(json.toString(), HTTP.UTF_8);
 			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
 			httppost.setEntity(se);
 

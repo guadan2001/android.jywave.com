@@ -2,7 +2,8 @@ package com.jywave.ui.activities;
 
 import com.jywave.AppMain;
 import com.jywave.R;
-import com.jywave.provider.EpProvider;
+import com.jywave.provider.UserProvider;
+import com.jywave.util.CommonUtil;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +11,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 public class AppSplashActivity extends Activity {
 	
@@ -56,6 +56,13 @@ public class AppSplashActivity extends Activity {
 		protected Void doInBackground(Void... params) {
 			app.initEpList();
 			app.initPlayer();
+			app.initPodcastersList();
+			
+			if(CommonUtil.checkNetState(thisContext))
+			{
+				UserProvider userProvider = new UserProvider(thisContext);
+				userProvider.activeUser();
+			}
 			return null;
 		}
 		
