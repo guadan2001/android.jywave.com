@@ -45,7 +45,8 @@
         android:background="@drawable/option_group_layout"
         android:divider="@color/gray_text"
         android:orientation="vertical"
-        android:showDividers="middle" >
+        android:showDividers="middle" 
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/optSettings"

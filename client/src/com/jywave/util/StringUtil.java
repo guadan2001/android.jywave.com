@@ -38,5 +38,12 @@ public class StringUtil {
 		
 		return result;
 	}
+	
+	public static String convertBytesToMBString(long bytesTotal)
+	{
+		float MB = (float)((float)bytesTotal / 10.24 / 1024.0);
+		
+		return String.valueOf(Math.round(MB) / 100) + "MB";
+	}
 
 }

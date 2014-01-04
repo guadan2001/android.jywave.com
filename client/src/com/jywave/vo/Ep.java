@@ -3,6 +3,7 @@ package com.jywave.vo;
 import java.io.File;
 
 import com.jywave.AppMain;
+import com.jywave.util.StringUtil;
 
 public class Ep {
 	public int id;
@@ -96,6 +97,34 @@ public class Ep {
 			{
 				status = Ep.IN_SERVER;
 			}
+		}
+	}
+	
+	private boolean isInLocal(String url)
+	{
+		String filename = AppMain.mp3StorageDir + StringUtil.getFilenameFromUrl(url);
+		File f = new File(filename);
+		if(f.exists())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	private long getSizeByUrl(String url)
+	{
+		String filename = AppMain.mp3StorageDir + StringUtil.getFilenameFromUrl(url);
+		File f = new File(filename);
+		if(f.exists())
+		{
+			return f.length();
+		}
+		else
+		{
+			return 0;
 		}
 	}
 }

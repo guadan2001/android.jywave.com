@@ -1,17 +1,9 @@
-guadan2001
--------------------------------------------------------------------
-1. 界面基础搭建
-2. icon图形素材准备
-3. 客户端基础代码构建
-
-xixilee
--------------------------------------------------------------------
-1. listview相关细节研究：下拉刷新、底部点击加载、左划删除
-2. 微博、QQ账户登录相关API研究
-3. 微信、朋友圈、微博、QQ空间、人人网 分享API研究
-
-Shane_Wayne
--------------------------------------------------------------------
-1. 数据库基础数据准备
-2. 通信数据格式确定
-3. 后台基础代码
+1. UI optimization
+2. Ep Rating
+3. Fix the Like Podcaster Bugs
+4. Share Ep to Q-Zone & pengyou.com
+5. Comment to Podcasters
+6. Podcaster Detail Page
+7. new Ep list item
+8. Some REST API for Administration
+9. Catch the http timeout and handle it

@@ -1,8 +1,8 @@
 package com.jywave.ui.fragments;
 
 import com.jywave.AppMain;
+import com.jywave.Player;
 import com.jywave.R;
-import com.jywave.player.Player;
 import com.jywave.ui.activities.AboutActivity;
 import com.jywave.ui.activities.FeedbackActivity;
 import com.jywave.ui.activities.PlayerActivity;
@@ -43,7 +43,7 @@ public class MainTabMoreFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.putExtra("epIndex", player.playingIndex);
 				intent.setClass(v.getContext(), PlayerActivity.class);
 				startActivity(intent);
 			}

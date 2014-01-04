@@ -76,7 +76,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="20dp"
                 android:adjustViewBounds="true"
-                android:background="@color/blue_app_main"
                 android:src="@drawable/picture"
                  />
 

@@ -13,6 +13,8 @@
     <color name="green_progress_bar_end">#33ff33</color>
     <color name="gray_text">#cccccc</color>
     <color name="gray_player_back">#333333</color>
+    <color name="gray_player_button">#3d3d3d</color>
+    <color name="gray_player_button_pressed">#505050</color>
     <color name="red_delete">#ff3333</color>
     <color name="red_delete_pressed">#cc3333</color>
     <color name="orange">#ff9900</color>

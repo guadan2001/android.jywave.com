@@ -2,7 +2,9 @@ package com.jywave.provider;
 
 import org.json.JSONObject;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.util.Log;
 
 import com.jywave.AppMain;
@@ -14,19 +16,19 @@ import com.jywave.util.CommonUtil;
 public class UserProvider {
 	public static final String TAG = "UserProvider";
 	public AppMain app = AppMain.getInstance();
-	private Context context;
+	private Context thisContext;
 
 	// Database
 	public DatabaseHelper database;
 
 	public UserProvider(Context context) {
 		database = new DatabaseHelper(context);
-		this.context = context;
+		thisContext = context;
 	}
 
 	public void activeUser() {
 
-		CommonUtil commonUtil = new CommonUtil(context);
+		CommonUtil commonUtil = new CommonUtil(thisContext);
 
 		try {
 			ApiRequest request = new ApiRequest();
@@ -36,6 +38,7 @@ public class UserProvider {
 			requestBody.put("imei", commonUtil.getDeviceIMEI());
 			requestBody.put("category", AppMain.deviceCategory);
 			requestBody.put("sysVersion", commonUtil.getSystemVersion());
+			requestBody.put("appVersion", thisContext.getPackageManager().getPackageInfo(AppMain.packageName, 0).versionName);
 			requestBody.put("manufacturer", commonUtil.getDeviceManufacturer());
 			
 			Log.d(TAG, "request body: " + requestBody.toString());

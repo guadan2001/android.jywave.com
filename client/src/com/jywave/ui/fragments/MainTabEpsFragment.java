@@ -24,13 +24,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jywave.AppMain;
+import com.jywave.Player;
 import com.jywave.R;
-import com.jywave.player.Player;
 import com.jywave.provider.EpProvider;
 import com.jywave.ui.activities.EpDetailActivity;
 import com.jywave.ui.activities.PlayerActivity;
-import com.jywave.ui.components.XListView;
-import com.jywave.ui.components.XListView.IXListViewListener;
+import com.jywave.ui.components.xlistview.XListView;
+import com.jywave.ui.components.xlistview.XListView.IXListViewListener;
 import com.jywave.util.CommonUtil;
 import com.jywave.vo.Ep;
 
@@ -48,14 +48,11 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	private MainTabEpsListAdapter epsAdapter;
 	private XListView listEps;
 	
-	private FinalBitmap fb;
-	
 	private boolean isRefreshing = false;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.d(TAG, "onCreateView");
 		View view = inflater.inflate(R.layout.main_tab_eps, container, false);
 		thisContext = this.getActivity();
 
@@ -71,47 +68,51 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 			btnPlaying.setVisibility(View.GONE);
 		}
 		
-		fb = FinalBitmap.create(this.getActivity());
-		fb.configLoadingImage(R.drawable.picture);
-		fb.configDiskCachePath(AppMain.imagesCacheDir);
-
 		epsAdapter = new MainTabEpsListAdapter(this.getActivity().getApplicationContext());
 		
-		if(app.sumOfEps == 0 && !isRefreshing)
-		{
-			if(CommonUtil.checkNetState(thisContext))
-			{
-				RefreshEpsTask task = new RefreshEpsTask();
-				task.execute(new Void[]{});
-			}
-			else
-			{
-				listEps.stopRefresh();
-				Toast.makeText(thisContext, "亲，你的网络貌似没有连接，请检查一下再来", Toast.LENGTH_LONG).show();
-			}
-			
-		}
+//		if(app.sumOfEps == 0 && !isRefreshing)
+//		{
+//			if(CommonUtil.checkNetState(thisContext))
+//			{
+//				RefreshEpsTask task = new RefreshEpsTask();
+//				task.execute(new Void[]{});
+//			}
+//			else
+//			{
+//				listEps.stopRefresh();
+//				Toast.makeText(thisContext, "亲，你的网络貌似没有连接，请检查一下再来", Toast.LENGTH_LONG).show();
+//			}
+//			
+//		}
 		
 		listEps.setAdapter(epsAdapter);
+		epsAdapter.notifyDataSetChanged();
+		
+		Log.d(TAG, "ep list size: " + String.valueOf(app.epsList.size()));
 
 		listEps.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Intent intent = new Intent();
-				intent.putExtra("epIndex", arg2 - 1);
-				
-				int status =app.epsList.data.get(arg2 -1).status; 
-				
-				if(status == Ep.IN_SERVER || status == Ep.DOWNLOADING)
+				if(listEps.getCount() > 2)
 				{
-					intent.setClass(arg1.getContext(), EpDetailActivity.class);
-					startActivity(intent);
+					Intent intent = new Intent();
+					
+					Ep ep = app.epsList.get(arg2 - 1);
+					
+					if(ep.status == Ep.IN_SERVER || ep.status == Ep.DOWNLOADING)
+					{
+						intent.setClass(arg1.getContext(), EpDetailActivity.class);
+						intent.putExtra("epIndex", arg2 - 1);
+						startActivity(intent);
+					}
+					else
+					{
+						intent.setClass(arg1.getContext(), PlayerActivity.class);
+						intent.putExtra("epIndex", app.downloadedEpsList.findIndexById(ep.id));
+						startActivity(intent);
+					}
 				}
-				else
-				{
-					intent.setClass(arg1.getContext(), PlayerActivity.class);
-					startActivity(intent);
-				}
+				
 			}
 		});
 
@@ -136,7 +137,7 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.putExtra("epIndex", player.playingIndex);
 				intent.setClass(v.getContext(), PlayerActivity.class);
 				startActivity(intent);
 			}
@@ -148,7 +149,6 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	@Override
 	public void onResume() {
 		super.onResume();
-		fb.onResume();
 
 		epsAdapter.notifyDataSetChanged();
 
@@ -164,21 +164,11 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 	@Override
 	public void onPause() {
 		super.onPause();
-		fb.onPause();
 	}
 
 	@Override
 	public void onDestroy() {
-		try {
-			super.onDestroy();
-			fb.exitTasksEarly(true);
-			fb.closeCache();
-			fb.onDestroy();
-			fb = null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		super.onDestroy();
 	}
 	
 	@Override
@@ -232,7 +222,6 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 		protected void onPostExecute(Void result)
 		{
 			app.initEpList();
-			player.refreshPlaylist();
 			epsAdapter.notifyDataSetChanged();
 			listEps.stopRefresh();
 			isRefreshing = false;
@@ -278,7 +267,7 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 		}
 
 		public int getCount() {
-			return app.epsList.data.size();
+			return app.epsList.size();
 		}
 
 		public Object getItem(int arg0) {
@@ -307,7 +296,7 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 				viewHolder = (ViewHolder) convertView.getTag();
 			}
 
-			ep = app.epsList.data.get(i);
+			ep = app.epsList.get(i);
 
 			viewHolder.txtEpTitle.setText(ep.title);
 			viewHolder.txtEpLength.setText(ep.getLengthString());
@@ -326,8 +315,9 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 				viewHolder.txtEpStatus.setText("已下载");
 				break;
 			case Ep.DOWNLOADING:
-				viewHolder.txtEpStatus.setText("已下载" + String.valueOf(ep.downloadProgress)
-						+ "%");
+				//viewHolder.txtEpStatus.setText("已下载" + String.valueOf(ep.downloadProgress)
+				//		+ "%");
+				viewHolder.txtEpStatus.setVisibility(View.GONE);
 				break;
 			case Ep.PLAYING:
 				viewHolder.txtEpStatus.setText("正在播放");
@@ -353,7 +343,7 @@ public class MainTabEpsFragment extends Fragment  implements IXListViewListener{
 			}
 
 			viewHolder.imgEpCover.setTag(ep.coverThumbnailUrl);
-			fb.display(viewHolder.imgEpCover, ep.coverThumbnailUrl);
+			app.fb.display(viewHolder.imgEpCover, AppMain.apiLocation + ep.coverThumbnailUrl);
 
 			return convertView;
 		}

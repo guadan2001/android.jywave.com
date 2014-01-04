@@ -1,4 +1,4 @@
-package com.jywave.ui.components;
+package com.jywave.ui.components.xlistview;
 
 import com.jywave.R;
 

@@ -1,6 +1,7 @@
 package com.jywave.ui.activities;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -8,8 +9,11 @@ import java.util.concurrent.TimeUnit;
 import net.tsz.afinal.FinalBitmap;
 
 import com.jywave.AppMain;
+import com.jywave.Player;
 import com.jywave.R;
-import com.jywave.player.Player;
+import com.jywave.provider.EpProvider;
+import com.jywave.service.DownloadService;
+import com.jywave.service.PlayerService;
 import com.jywave.util.NetUtil;
 import com.jywave.util.StringUtil;
 import com.jywave.vo.DownloadItem;
@@ -48,6 +52,7 @@ import android.widget.Toast;
 public class EpDetailActivity extends FragmentActivity implements
 		OnGestureListener, OnTouchListener {
 
+	@SuppressWarnings("unused")
 	private static final String TAG = "EpDetailActivity";
 
 	private LinearLayout pageEpDetail;
@@ -75,8 +80,6 @@ public class EpDetailActivity extends FragmentActivity implements
 
 	private GestureDetector gestureDetector;
 
-	private FinalBitmap fb;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -103,8 +106,12 @@ public class EpDetailActivity extends FragmentActivity implements
 		index = intent.getIntExtra("epIndex", 0);
 
 		// Set EP Data
-		ep = app.epsList.data.get(index);
+		ep = app.epsList.get(index);
 		app.latestClickedEpIndex = index;
+		ep.isNew = false;
+		
+		EpProvider epProvider = new EpProvider(thisContext);
+		epProvider.setIsNew(ep.id, false);
 
 		// Set Texts
 		txtEpTitle.setText(ep.title);
@@ -115,10 +122,8 @@ public class EpDetailActivity extends FragmentActivity implements
 		btnClickToPlay.setVisibility(View.GONE);
 
 		// Load EP Cover
-		fb = FinalBitmap.create(this);
-		fb.configDiskCachePath(AppMain.imagesCacheDir);
 		imgEpCover.setTag(ep.coverUrl);
-		fb.display(imgEpCover, ep.coverUrl);
+		app.fb.display(imgEpCover, AppMain.apiLocation + ep.coverUrl);
 
 		// Ep rank
 		switch (ep.star) {
@@ -151,8 +156,20 @@ public class EpDetailActivity extends FragmentActivity implements
 			pbDownloadProgress.setProgress(ep.downloadProgress);
 
 			downloadMgr = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-			downloadMgrRef = Long.parseLong(app.downloadList.get(String
-					.valueOf(index)));
+			
+			Iterator<Long> iter = app.downloadList.keySet().iterator();
+
+			while (iter.hasNext()) {
+
+			    long key = iter.next();
+			    int value = app.downloadList.get(key);
+			    
+			    if(value == ep.id)
+			    {
+			    	downloadMgrRef = key;
+			    	break;
+			    }
+			}
 
 			startListenDownloadComplete();
 			downloadProgressUpdater = Executors.newScheduledThreadPool(1);
@@ -178,7 +195,7 @@ public class EpDetailActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.putExtra("epIndex", player.playingIndex);
 				intent.setClass(v.getContext(), PlayerActivity.class);
 				startActivity(intent);
 			}
@@ -212,11 +229,13 @@ public class EpDetailActivity extends FragmentActivity implements
 		public void onClick(View v) {
 
 			ep.status = Ep.DOWNLOADING;
-			app.epsList.data.get(index).status = Ep.DOWNLOADING;
+			app.epsList.get(index).status = Ep.DOWNLOADING;
 
 			btnDownloadCancel.setVisibility(View.VISIBLE);
 			btnDownloadCtrl.setVisibility(View.GONE);
 			pbDownloadProgress.setVisibility(View.VISIBLE);
+			
+			startService(new Intent(thisContext, DownloadService.class));
 
 			Uri uri = Uri.parse(ep.url);
 			String filename = StringUtil.getFilenameFromUrl(ep.url);
@@ -229,8 +248,7 @@ public class EpDetailActivity extends FragmentActivity implements
 			}
 			downloadMgrRef = downloadMgr.enqueue(request);
 
-			app.downloadList.put(String.valueOf(index),
-					String.valueOf(downloadMgrRef));
+			app.downloadList.put(downloadMgrRef, ep.id);
 
 			pbDownloadProgress.setProgress(0);
 
@@ -246,7 +264,8 @@ public class EpDetailActivity extends FragmentActivity implements
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
-			intent.putExtra("epIndex", index);
+			int idx = app.downloadedEpsList.findIndexById(ep.id);
+			intent.putExtra("epIndex", idx);
 			intent.setClass(thisContext, PlayerActivity.class);
 			startActivity(intent);
 			finish();
@@ -269,31 +288,24 @@ public class EpDetailActivity extends FragmentActivity implements
 			long reference = intent.getLongExtra(
 					DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 			if (reference == downloadMgrRef) {
-				DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr,
-						downloadMgrRef);
+				DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
 				if (di.status == DownloadManager.STATUS_SUCCESSFUL) {
 					btnDownloadCancel.setVisibility(View.GONE);
 					pbDownloadProgress.setVisibility(View.GONE);
 					btnClickToPlay.setVisibility(View.VISIBLE);
 
 					ep.status = Ep.IN_LOCAL;
-					app.epsList.data.get(index).status = Ep.IN_LOCAL;
-
-					player.refreshPlaylist();
-
-					app.downloadList.remove(index);
+					app.epsList.get(index).status = Ep.IN_LOCAL;
 				} else if (di.status == DownloadManager.STATUS_FAILED) {
 					btnDownloadCancel.setVisibility(View.GONE);
 					pbDownloadProgress.setVisibility(View.GONE);
 					btnDownloadCtrl.setVisibility(View.VISIBLE);
 
 					ep.status = Ep.IN_SERVER;
-					app.epsList.data.get(index).status = Ep.IN_SERVER;
+					app.epsList.get(index).status = Ep.IN_SERVER;
 
 					ep.downloadProgress = 0;
-					app.epsList.data.get(index).downloadProgress = 0;
-
-					app.downloadList.remove(index);
+					app.epsList.get(index).downloadProgress = 0;
 
 					Toast.makeText(thisContext,
 							"下载失败，错误代码：" + String.valueOf(di.reason),
@@ -302,6 +314,7 @@ public class EpDetailActivity extends FragmentActivity implements
 
 				downloadProgressUpdater.shutdownNow();
 			}
+			stopListenDownloadComplete();
 		}
 	};
 
@@ -343,7 +356,7 @@ public class EpDetailActivity extends FragmentActivity implements
 							btnClickToPlay.setVisibility(View.GONE);
 
 							ep.status = Ep.IN_SERVER;
-							app.epsList.data.get(index).status = Ep.IN_SERVER;
+							app.epsList.get(index).status = Ep.IN_SERVER;
 
 							downloadMgr.remove(downloadMgrRef);
 							app.downloadList.remove(String.valueOf(index));
@@ -371,13 +384,12 @@ public class EpDetailActivity extends FragmentActivity implements
 
 		@Override
 		public void run() {
-			DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr,
-					downloadMgrRef);
+			DownloadItem di = NetUtil.queryDownloadItemByRefId(downloadMgr, downloadMgrRef);
 
 			if (di.status == DownloadManager.STATUS_RUNNING) {
-				pbDownloadProgress.setProgress(di.progress);
-				ep.downloadProgress = di.progress;
-				app.epsList.data.get(index).downloadProgress = di.progress;
+				pbDownloadProgress.setProgress(di.getDownloadProgress());
+				ep.downloadProgress = di.getDownloadProgress();
+				app.epsList.get(index).downloadProgress = di.getDownloadProgress();
 			}
 		}
 	};
@@ -432,33 +444,22 @@ public class EpDetailActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onDestroy() {
+	protected void onDestroy() {
 		super.onDestroy();
 
 		if (ep.status == Ep.DOWNLOADING) {
 			unregisterReceiver(receiver);
 			downloadProgressUpdater.shutdownNow();
 		}
-		
-		try {
-			fb.exitTasksEarly(true);
-			fb.closeCache();
-			fb.onDestroy();
-			fb = null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		fb.onPause();
 	}
 
 	@Override
-	public void onResume() {
+	protected void onResume() {
 		super.onResume();
-		fb.onResume();
 	}
 }

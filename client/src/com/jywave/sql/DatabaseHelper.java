@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 	
+	@SuppressWarnings("unused")
 	private static final String TAG = "SQLiteOpenHelper";
  
     private static final String DB_NAME = "jywave.db";
@@ -49,7 +50,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
  
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
+//    	if(oldVersion == 1)
+//    	{
+//    		String sql = "ALTER TABLE eps ADD COLUMN status INTEGER NULL";
+//    		db.execSQL(sql);
+//    	}
  
     }
 }

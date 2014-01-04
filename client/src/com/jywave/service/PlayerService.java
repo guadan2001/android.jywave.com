@@ -1,7 +1,9 @@
-package com.jywave.player;
+package com.jywave.service;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.jywave.Player;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -139,6 +141,7 @@ public class PlayerService extends Service {
 			mediaPlayer.release();
 			mediaPlayer = null;
 		}
+		super.onDestroy();
 	}
 
 	private final class PreparedListener implements OnPreparedListener {

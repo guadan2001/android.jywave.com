@@ -1,12 +1,7 @@
 package com.jywave;
 
 public final class Constants {
-	
-//----------------------------------------------------//
-//			player service message constants		  //
-//----------------------------------------------------//
-	
-	
-	
+
+	public static final int NOTIFICATION_ID_DOWNLOAD_COMPLETE_BASE = 1000;
 
 }

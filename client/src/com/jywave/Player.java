@@ -1,12 +1,9 @@
-package com.jywave.player;
+package com.jywave;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
-
-import com.jywave.AppMain;
 import com.jywave.vo.Ep;
 
 public class Player {
@@ -16,19 +13,21 @@ public class Player {
 
 	public int timeElapsed;
 	public int duration;
-	public int playingIndexOfPlaylist;
-	public int playingIndexOfEpList;
+
+	// Index of playing Ep in app.downloadedEpsList
+	public int playingIndex;
+	// Index of playing Ep in app.epsList, if the playing Ep is not exist in
+	// app.epsList, the playingIndexOfEpsList = -1
+	public int playingIndexOfEpsList;
+	// Id of playing Ep
 	public int playingId;
 
 	public String uri;
 	public boolean isPlaying;
 
-	public List<Integer> playlist; // item: Ep.id
-	
 	public int sleepTimerOption;
 
 	public static final String PLAYER_ACTION_PLAYBACK_CTRL = "PLAYER_ACTION_PLAYBACK_CTRL";
-	//public static final String PLAYER_ACTION_PLAYING = "PLAYER_ACTION_PLAYING";
 	public static final String PLAYER_ACTION_COMPLETE = "PLAYER_ACTION_COMPLETE";
 	public static final String PLAYER_ACTION_CURRENT = "PLAYER_ACTION_CURRENT";
 	public static final String PLAYER_ACTION_SERVICE_READY = "PLAYER_ACTION_SERVICE_READY";
@@ -45,11 +44,10 @@ public class Player {
 	public static final int PLAYER_CMD_SEEKTO = 7;
 
 	public static final String PLAYER_PARAMS_CMD = "PLAYER_PARAMS_CMD";
-	//public static final String PLAYER_PARAMS_PATH = "PLAYER_PARAMS_PATH";
 	public static final String PLAYER_PARAMS_SEEKTO = "PLAYER_PARAMS_SEEKTO";
 	public static final String PLAYER_PARAMS_DURATION = "PLAYER_PARAMS_DURATION";
 	public static final String PLAYER_PARAMS_CURRENT_POSITION = "PLAYER_PARAMS_CURRENT_POSITION";
-	
+
 	public static final int PLAYER_SLEEP_TIMER_NONE = 0;
 	public static final int PLAYER_SLEEP_TIMER_15MINS = 1;
 	public static final int PLAYER_SLEEP_TIMER_30MINS = 2;
@@ -63,101 +61,67 @@ public class Player {
 		} else {
 			return new Player();
 		}
-
 	}
 
 	private Player() {
-		playlist = new ArrayList<Integer>();
-		refreshPlaylist();
 		sleepTimerOption = 0;
 		singleton = this;
 	}
 
-	public void refreshPlaylist() {
-		if (app.epsList.size() > 0) {
-			for (int i = 0; i < app.epsList.size(); i++) {
-				String filename = app.epsList.data.get(i).getEpFilename();
-				File f = new File(AppMain.mp3StorageDir + filename);
-				if (f.exists()) {
-					if (app.epsList.data.get(i).status == Ep.IN_LOCAL) {
-						playlist.add(app.epsList.data.get(i).id);
-					} else {
-						app.epsList.data.get(i).status = Ep.IN_LOCAL;
-					}
-				}
-				
-				if(isPlaying)
-				{
-					if(playingId == app.epsList.data.get(i).id)
-					{
-						app.epsList.data.get(i).status = Ep.PLAYING;
-					}
-				}
+	public void play(Ep ep) {
+
+		int indexInDownloadedList = app.downloadedEpsList.findIndexById(ep.id);
+		int indexInEpsList = app.epsList.findIndexById(ep.id);
+
+		if (playingId > 0) {
+			app.downloadedEpsList.get(playingIndex).status = Ep.IN_LOCAL;
+			app.downloadedEpsList.get(indexInDownloadedList).status = Ep.PLAYING;
+			
+			if(indexInEpsList >= 0)
+			{
+				app.epsList.get(indexInEpsList).status = Ep.PLAYING;
+			}
+			
+			if(playingIndexOfEpsList >= 0)
+			{
+				app.epsList.get(playingIndexOfEpsList).status = Ep.IN_LOCAL;
 			}
 		}
 
-		playingIndexOfEpList = app.epsList.findIndexById(playingId);
-		playingIndexOfPlaylist = playlist.indexOf(playingId);
-	}
-
-	public void play(Ep ep) {
-		
-		int epIndex = app.epsList.findIndexById(ep.id);
-		
-		if(playingId > 0)
-		{
-			app.epsList.data.get(playingIndexOfEpList).status = Ep.IN_LOCAL;
-			app.epsList.data.get(epIndex).status = Ep.PLAYING;
-		}
-		
 		playingId = ep.id;
-		playingIndexOfPlaylist = playlist.indexOf(playingId);
-		playingIndexOfEpList = epIndex;
+		playingIndex = indexInDownloadedList;
+		playingIndexOfEpsList = indexInEpsList;
 		duration = ep.duration;
 		timeElapsed = 0;
 
 		isPlaying = true;
 		uri = AppMain.mp3StorageDir + ep.getEpFilename();
 	}
-	
-	public void pause()
-	{
+
+	public void pause() {
 		isPlaying = false;
 	}
-	
-	public void next()
-	{
-		if(playlist.size() > 1)
-		{
-			if(playingIndexOfPlaylist < playlist.size() - 1)
-			{
-				playingIndexOfPlaylist++;
+
+	public void next() {
+		if (app.downloadedEpsList.size() > 1) {
+			if (playingIndex < app.downloadedEpsList.size() - 1) {
+				playingIndex++;
+			} else {
+				playingIndex = 0;
 			}
-			else
-			{
-				playingIndexOfPlaylist = 0;
-			}
-			int epId = playlist.get(playingIndexOfPlaylist);
-			
-			play(app.epsList.getEpById(epId));
+			play(app.downloadedEpsList.get(playingIndex));
 		}
 	}
-	
-	public void prev()
-	{
-		if(playlist.size() > 1)
-		{
-			if(playingIndexOfPlaylist > 0)
-			{
-				playingIndexOfPlaylist--;
-			}
-			else
-			{
-				playingIndexOfPlaylist = playlist.size() - 1;
+
+	public void prev() {
+		if (app.downloadedEpsList.size() > 1) {
+			if (playingIndex > 0) {
+				playingIndex--;
+			} else {
+				playingIndex = app.downloadedEpsList.size() - 1;
 			}
 			
-			int epId = playlist.get(playingIndexOfPlaylist);
-			play(app.epsList.getEpById(epId));
+			play(app.downloadedEpsList.get(playingIndex));
 		}
 	}
 }

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <FrameLayout
+        android:id="@+id/back"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:paddingBottom="6.0dip"
+        android:paddingTop="6.0dip"
+        android:tag="back" >
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="64.0dip"
+            android:layout_height="34.0dip"
+            android:layout_gravity="right|center"
+            android:layout_marginRight="10.0dip"
+            android:background="@color/red_delete"
+            android:text="@string/delete"
+            android:textColor="@color/white"
+            android:textSize="14.0dip" />
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/front"
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:background="@drawable/list_item_bg"
+        android:tag="front" >
+
+        <ImageView
+            android:id="@+id/imgEpCover"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/picture" />
+
+        <TextView
+            android:id="@+id/txtEpTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:layout_marginTop="5dp"
+            android:includeFontPadding="false"
+            android:textColor="@color/black"
+            android:textSize="15.0sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="5dp" 
+            android:layout_marginLeft="70dp">
+
+            <TextView
+                android:id="@+id/txtEpLength"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/downloading"
+                android:textColor="@color/gray_text"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/txtEpDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:text="@string/downloading"
+                android:textColor="@color/gray_text"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>

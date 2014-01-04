@@ -1,8 +1,8 @@
 package com.jywave.ui.activities;
 
 import com.jywave.AppMain;
+import com.jywave.Player;
 import com.jywave.R;
-import com.jywave.player.Player;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +16,9 @@ import android.widget.ImageSwitcher;
 import android.widget.RelativeLayout;
 import android.widget.TextSwitcher;
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends Activity{
+	
+	@SuppressWarnings("unused")
 	private static final String TAG = "AboutActivity";
 	private AppMain app = AppMain.getInstance();
 	private Player player = Player.getInstance();
@@ -58,7 +60,7 @@ public class AboutActivity extends Activity {
 		if (!player.isPlaying) {
 			btnPlaying.setVisibility(View.GONE);
 		}
-
+		
 		btnBack.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -72,7 +74,7 @@ public class AboutActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.putExtra("epIndex", player.playingIndex);
 				intent.setClass(v.getContext(), PlayerActivity.class);
 				startActivity(intent);
 			}
@@ -151,4 +153,17 @@ public class AboutActivity extends Activity {
 		});
 
 	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+	
+//	private void followSinaWeibo()
+//	{
+//		Platform plat = ShareSDK.getPlatform(this, SinaWeibo.NAME);
+//		plat.setPlatformActionListener(this);
+//		//plat.authorize();
+//		plat.followFriend(AppMain.uidSinaWeibo);
+//	}
 }

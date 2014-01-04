@@ -35,12 +35,12 @@
         android:background="@color/dark_blue_1" >
     </LinearLayout>
 
-    <com.jywave.ui.components.XListView
+    <com.jywave.ui.components.xlistview.XListView
         android:id="@+id/listPodcasters"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         >
-    </com.jywave.ui.components.XListView>
+    </com.jywave.ui.components.xlistview.XListView>
 
 </LinearLayout>

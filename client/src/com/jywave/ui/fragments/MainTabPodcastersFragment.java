@@ -19,12 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jywave.AppMain;
+import com.jywave.Player;
 import com.jywave.R;
-import com.jywave.player.Player;
 import com.jywave.provider.PodcasterProvider;
 import com.jywave.ui.activities.PlayerActivity;
-import com.jywave.ui.components.XListView;
-import com.jywave.ui.components.XListView.IXListViewListener;
+import com.jywave.ui.components.xlistview.XListView;
+import com.jywave.ui.components.xlistview.XListView.IXListViewListener;
 import com.jywave.vo.Podcaster;
 
 public class MainTabPodcastersFragment extends Fragment implements
@@ -44,8 +44,6 @@ public class MainTabPodcastersFragment extends Fragment implements
 	private boolean isRefreshing = false;
 	private int clickedIndex;
 
-	private FinalBitmap fb;
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -60,10 +58,6 @@ public class MainTabPodcastersFragment extends Fragment implements
 		listPodcasters.setPullLoadEnable(false);
 		listPodcasters.setPullRefreshEnable(true);
 		listPodcasters.setXListViewListener(this);
-
-		fb = FinalBitmap.create(this.getActivity());
-		fb.configLoadingImage(R.drawable.picture);
-		fb.configDiskCachePath(AppMain.imagesCacheDir);
 
 		if (!player.isPlaying) {
 			btnPlaying.setVisibility(View.GONE);
@@ -106,7 +100,7 @@ public class MainTabPodcastersFragment extends Fragment implements
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.putExtra("epIndex", player.playingIndexOfEpList);
+				intent.putExtra("epIndex", player.playingIndex);
 				intent.setClass(v.getContext(), PlayerActivity.class);
 				startActivity(intent);
 			}
@@ -118,27 +112,16 @@ public class MainTabPodcastersFragment extends Fragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		fb.onResume();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		fb.onPause();
 	}
 
 	@Override
 	public void onDestroy() {
-		try {
-			super.onDestroy();
-			fb.setExitTasksEarly(true);
-			fb.closeCache();
-			fb.onDestroy();
-			fb = null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+		super.onDestroy();
 	}
 
 	@Override
@@ -353,7 +336,7 @@ public class MainTabPodcastersFragment extends Fragment implements
 			viewHolder.imgAvatar.setTag(AppMain.apiLocation
 					+ podcaster.avatarUrl);
 			String url = AppMain.apiLocation + podcaster.avatarUrl;
-			fb.display(viewHolder.imgAvatar, url);
+			app.fb.display(viewHolder.imgAvatar, url);
 
 			if (this.imgswtHeartListener != null) {
 				viewHolder.imgswtHeart

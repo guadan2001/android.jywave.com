@@ -13,14 +13,16 @@ import com.jywave.sql.DatabaseHelper;
 public class CommonProvider {
 	public static final String TAG = "CommonProvider";
 	public AppMain app = AppMain.getInstance();
-	private Context context;
+	
+	@SuppressWarnings("unused")
+	private Context thisContext;
 
 	// Database
 	public DatabaseHelper database;
 
 	public CommonProvider(Context context) {
 		database = new DatabaseHelper(context);
-		this.context = context;
+		this.thisContext = context;
 	}
 	
 	public boolean feedback(String nickname, String content)
